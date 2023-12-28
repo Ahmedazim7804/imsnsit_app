@@ -1,9 +1,87 @@
 import 'dart:convert';
-
+import 'package:cookie_store/cookie_store.dart';
 import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+
+class Session {
+  final client = http.Client();
+  CookieStore cookies = CookieStore();
+
+  int maxRedirects;
+
+  Session({this.maxRedirects = 15}) {
+  }
+
+
+  Future<Response> get(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}}) async {
+    if (--redirectsLeft < 0) {
+      throw Exception('Too many Redirects');
+    }
+
+    headers['Cookie'] = getCookies(url);
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.isRedirect) {
+      String? location = response.headers['location'];
+      if (location != null) {
+        final redirectUri = url.resolve(location);
+        
+        if (response.request!.method.toLowerCase() == 'get') {
+          return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
+        } 
+        else if (response.request!.method.toLowerCase() == 'post') {
+          return post(url, redirectsLeft: redirectsLeft-1, headers: headers);
+        }
+      }
+    }
+
+    return response;
+  }
+
+  Future<Response> post(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}, Map<String, String> data = const{}}) async {
+    if (--redirectsLeft < 0) {
+      throw Exception('Too many Redirects');
+    }
+
+    headers['Cookie'] = getCookies(url);
+
+    final response = await http.post(url, headers: headers, body: data);
+
+    updateCookies(response.headers, url);
+
+    if (response.isRedirect) {
+      String? location = response.headers['location'];
+      if (location != null) {
+        final redirectUri = url.resolve(location);
+        
+        if (response.request!.method.toLowerCase() == 'get') {
+          return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
+        } 
+        else if (response.request!.method.toLowerCase() == 'post') {
+          return post(url, redirectsLeft: redirectsLeft-1, headers: headers, data: data);
+        }
+      }
+    }
+    
+    return response;
+  }
+
+  String getCookies(Uri url) {
+    String cookieHeader = CookieStore.buildCookieHeader(cookies.getCookiesForRequest(url.host, url.path));
+    return cookieHeader;
+  }
+
+  void updateCookies(Map<String, String> headers, Uri url) {
+    String? rawCookies = headers['set-cookie'];
+    if (rawCookies != null) {
+      cookies.updateCookies(rawCookies, url.host, url.path);
+    }
+  }
+
+}
 
 class Ims {
   
