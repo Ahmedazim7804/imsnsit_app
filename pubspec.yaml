@@ -3,4 +3,4 @@ environment:
   sdk: '>=3.2.3 <4.0.0'
 dependencies:
   http_session: ^0.2.1
-  # web_scraper:
+  html:
