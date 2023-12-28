@@ -24,17 +24,15 @@ class Ims {
   String? profileUrl;
   String? myActivitiesUrl;
   List<String> allUrls = [];
-  late Future<HttpSession> _session;
+  final HttpSession session = HttpSession.shared;
   bool isAuthenticated = false;
-  
+
   Ims() {
-    this._session = getSession();
+    getSessionAttributes();
   }
    
   
-  Future<HttpSession> getSession() async {
-
-    HttpSession session = HttpSession.shared;
+  Future<HttpSession> getSessionAttributes() async {
 
     final file = await File('data.json');
     final fileContent = await file.readAsString();
@@ -71,23 +69,23 @@ class Ims {
   }
 
   void authenticate() async {
-    _session.then((session) {
 
-      session.get(this.baseUrl, headers: this.baseHeaders);
+    await session.get(this.baseUrl, headers: this.baseHeaders);
 
-      getCaptcha();
-
-    });
+    getCaptcha();
 
     
   }
 
   Future<(String, String)> getCaptcha() async {
-    _session.then((session) async {
-      final response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
 
-      print(response.body);
-    });
+    this.baseHeaders.addAll({
+          'Referer': 'https://www.imsnsit.org/imsnsit/',
+          'Sec-Fetch-User': '?1'
+          });
+
+    final response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
+    print(response.body);
 
     return ('s', 's');
   }
