@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cookie_store/cookie_store.dart';
+import 'package:html/dom.dart';
 import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -21,20 +22,18 @@ class Session {
     }
 
     headers['Cookie'] = getCookies(url);
-
+    
     final response = await http.get(url, headers: headers);
 
-    if (response.isRedirect) {
+    updateCookies(response.headers, url);
+
+    if (response.headers.containsKey('location')) {
       String? location = response.headers['location'];
+      headers['location'] = '';
       if (location != null) {
         final redirectUri = url.resolve(location);
         
-        if (response.request!.method.toLowerCase() == 'get') {
-          return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
-        } 
-        else if (response.request!.method.toLowerCase() == 'post') {
-          return post(url, redirectsLeft: redirectsLeft-1, headers: headers);
-        }
+        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
       }
     }
 
@@ -52,17 +51,13 @@ class Session {
 
     updateCookies(response.headers, url);
 
-    if (response.isRedirect) {
+    if (response.headers.containsKey('location')) {
       String? location = response.headers['location'];
+      headers['location'] = '';
       if (location != null) {
         final redirectUri = url.resolve(location);
         
-        if (response.request!.method.toLowerCase() == 'get') {
-          return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
-        } 
-        else if (response.request!.method.toLowerCase() == 'post') {
-          return post(url, redirectsLeft: redirectsLeft-1, headers: headers, data: data);
-        }
+        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
       }
     }
     
@@ -104,15 +99,11 @@ class Ims {
   String? profileUrl;
   String? myActivitiesUrl;
   List<String> allUrls = [];
-  final HttpSession session = HttpSession(acceptBadCertificate: false,);
+  final Session session = Session();
   bool isAuthenticated = false;
-
-  Ims() {
-    getSessionAttributes();
-  }
    
   
-  Future<HttpSession> getSessionAttributes() async {
+  Future<void> getSessionAttributes() async {
 
     final file = await File('data.json');
     final fileContent = await file.readAsString();
@@ -120,9 +111,9 @@ class Ims {
     Map<String, dynamic> jsonContent = jsonDecode(fileContent);
   
     if (jsonContent.keys.contains('cookies')) {
-      session.cookieStore.updateCookies(jsonContent['cookies'], 'imsnsit.org', '/');
+      session.cookies.updateCookies(jsonContent['cookies'], 'imsnsit.org', '/');
     }
-
+    print(jsonContent.keys);
     if (jsonContent.containsKey('profileUrl') && jsonContent['profileUrl'] != null) {
       this.profileUrl = jsonContent['profileUrl'];
     }
@@ -130,8 +121,6 @@ class Ims {
     if (jsonContent.containsKey('myActivitiesUrl') && jsonContent['myActivitiesUrl'] != null) {
       this.myActivitiesUrl = jsonContent['myActivitiesUrl'];
     }
-
-    return session;
   } 
 
   void store(Map<String, String> data) async {
@@ -148,7 +137,28 @@ class Ims {
     file.writeAsString(fileContent);
   }
 
-  void authenticate() async {
+  Future<bool> isUserAuthenticated() async {
+    await getSessionAttributes();
+    print(session.cookies.cookies);
+      try {
+        final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
+
+        if (response.body.contains('Session expired')) {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+
+    return true;
+  }
+
+  Future<void> authenticate() async {
+
+    if (await isUserAuthenticated()) {
+      isAuthenticated = true;
+      return;
+    }
 
     await session.get(this.baseUrl, headers: this.baseHeaders);
 
@@ -167,28 +177,38 @@ class Ims {
     print("Enter The Captcha $captchaImage : ");
     final cap = await stdin.readLineSync();
     
-    Map data = {
+    Map<String, String> data = {
             'f': '',
             'uid': '***REMOVED***',
             'pwd': '***REMOVED***',
             'HRAND_NUM': hrandNum,
             'fy': '2023-24',
             'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
-            'cap': cap,
+            'cap': cap!,
             'logintype': 'student',
         };
-    String cookies = session.cookieStore.cookies[0].toString();
-    cookies = cookies.split(', ')[0];
-    baseHeaders['Cookie'] = cookies;
-    print(cookies);
 
-    var response = await http.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, body: data);
-    final uww = baseUrl.resolve(response.headers['location']!);
-    response = await http.get(uww, headers: baseHeaders);
-
-    print(response.body);
-
+    var response = await session.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, data: data);
     
+    final doc = parse(response.body);
+    final List links = doc.getElementsByTagName('a');
+    for (Element link in links) {
+      if (link.text == 'Profile') {
+        profileUrl = link.attributes['href'];
+      }
+      if (link.text == 'My Activities') {
+        myActivitiesUrl = link.attributes['href'];
+      }
+    }
+
+    store({
+      'cookies': session.getCookies(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
+      'profileUrl': profileUrl!,
+      'myActivitiesUrl': myActivitiesUrl!
+    });
+
+    isAuthenticated = true;
+
   }
 
   Future<(String, String)> getCaptcha() async {
@@ -198,9 +218,11 @@ class Ims {
           'Sec-Fetch-User': '?1'
           });
 
-    final response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
-    final doc = parse(response.body);
+    var response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
+    response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders);
 
+    final doc = parse(response.body);
+    
     String? captchaImage = doc.getElementById('captchaimg')!.attributes['src'];
     captchaImage = Uri.parse(baseUrl.toString()).resolve(captchaImage!).toString();
     String? hrand = doc.getElementById('HRAND_NUM')!.attributes['value'];
@@ -208,11 +230,46 @@ class Ims {
     return (captchaImage, hrand!);
   }
 
+  void getProfileData() async {
+    if (!isAuthenticated) {
+      authenticate();
+    }
+    print(profileUrl);
+    final response = await http.get(Uri.parse(profileUrl!), headers: baseHeaders);
+    print(response.body);
+  }
+
 }
+void main() async {
 
-void main() {
+  // final ims = Ims();
+  // await ims.authenticate();
+  // ims.getProfileData();
 
-  final ims = Ims();
-  ims.authenticate();
+
+  final headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.119 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    //'Referer': 'https://www.imsnsit.org/imsnsit/plum_url.php?xS8C9E3DSlqtqdmz1vDdC+8QlIk4lWi6nzu8ujac4HB9DQxz9vD/KnyhycO5HA1pkhGH+jvvgZoKNcATZMpgmQ==',
+    'Connection': 'keep-alive',
+    'Cookie': 'PHPSESSID=53hljq61cst22vdcchj951jtl6',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'frame',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Accept-Encoding': 'gzip',
+  };
+
+  final url = Uri.parse('https://www.imsnsit.org/imsnsit/plum_url.php?tXSfLx1qF8T2Een4lOffgVuX/+thUqgUtWXVKyN+rH5ebsz02HawOqP4jnwsz0DCHu843s8Alnpp97X1jzO0Z9MqlHj0UnN7c3DH38y+HBE=');
+
+  final res = await http.get(url, headers: headers);
+  final status = res.statusCode;
+  if (status != 200) throw Exception('http.get error: statusCode= $status');
+  print(res.request!.url);
+  print(res.body);
+
 
 }
