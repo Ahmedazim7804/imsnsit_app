@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:http_session/http_session.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 import 'dart:io';
 
 class Ims {
@@ -24,7 +26,7 @@ class Ims {
   String? profileUrl;
   String? myActivitiesUrl;
   List<String> allUrls = [];
-  final HttpSession session = HttpSession.shared;
+  final HttpSession session = HttpSession(acceptBadCertificate: false,);
   bool isAuthenticated = false;
 
   Ims() {
@@ -72,7 +74,41 @@ class Ims {
 
     await session.get(this.baseUrl, headers: this.baseHeaders);
 
-    getCaptcha();
+    var (String captchaImage, String hrandNum) = await getCaptcha();
+
+    this.baseHeaders.addAll(
+      {
+        'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://www.imsnsit.org',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'frame',
+      }
+    );
+
+    print("Enter The Captcha $captchaImage : ");
+    final cap = await stdin.readLineSync();
+    
+    Map data = {
+            'f': '',
+            'uid': '***REMOVED***',
+            'pwd': '***REMOVED***',
+            'HRAND_NUM': hrandNum,
+            'fy': '2023-24',
+            'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
+            'cap': cap,
+            'logintype': 'student',
+        };
+    String cookies = session.cookieStore.cookies[0].toString();
+    cookies = cookies.split(', ')[0];
+    baseHeaders['Cookie'] = cookies;
+    print(cookies);
+
+    var response = await http.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, body: data);
+    final uww = baseUrl.resolve(response.headers['location']!);
+    response = await http.get(uww, headers: baseHeaders);
+
+    print(response.body);
 
     
   }
@@ -85,9 +121,13 @@ class Ims {
           });
 
     final response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
-    print(response.body);
+    final doc = parse(response.body);
 
-    return ('s', 's');
+    String? captchaImage = doc.getElementById('captchaimg')!.attributes['src'];
+    captchaImage = Uri.parse(baseUrl.toString()).resolve(captchaImage!).toString();
+    String? hrand = doc.getElementById('HRAND_NUM')!.attributes['value'];
+
+    return (captchaImage, hrand!);
   }
 
 }
