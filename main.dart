@@ -6,6 +6,9 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
+import 'parseData.dart';
+
+
 class Session {
   final client = http.Client();
   CookieStore cookies = CookieStore();
@@ -113,7 +116,7 @@ class Ims {
   String? profileUrl;
   String? myActivitiesUrl;
   String? referrer;
-  List<String> allUrls = [];
+  Map<String, dynamic> allUrls = {};
   final Session session = Session();
   bool isAuthenticated = false;
    
@@ -140,9 +143,13 @@ class Ims {
     if (jsonContent.containsKey('referrer') && jsonContent['referrer'] != null) {
       this.referrer = jsonContent['referrer'];
     }
+
+    if (jsonContent.containsKey('allUrls') && jsonContent['allUrls'] != null) {
+      this.allUrls = jsonContent['allUrls'];
+    }
   } 
 
-  void store(Map<String, String> data) async {
+  void store(Map<String, dynamic> data) async {
     final file = await File('data.json');
 
     var fileContent = await file.readAsString();
@@ -227,11 +234,14 @@ class Ims {
       }
     }
 
+    await getAllUrls();
+
     store({
       'cookies': session.getCookies(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
       'profileUrl': profileUrl!,
       'myActivitiesUrl': myActivitiesUrl!,
-      'referrer': referrer!
+      'referrer': referrer!,
+      'allUrls': allUrls,
     });
 
     isAuthenticated = true;
@@ -257,7 +267,7 @@ class Ims {
     return (captchaImage, hrand!);
   }
 
-  void getProfileData() async {
+  Future<Map<String, String>> getProfileData() async {
     if (!isAuthenticated) {
       authenticate();
     }
@@ -268,7 +278,40 @@ class Ims {
 
     final response = await session.get(Uri.parse(profileUrl!), headers: this.baseHeaders);
 
+    final profileData = ParseData.parseProfileData(response.body);
+
+    return profileData;
+  }
+
+  Future<void> getAllUrls() async {
+
+    final response = await session.get(Uri.parse(myActivitiesUrl!), headers: this.baseHeaders);
+
+    final doc = parse(response.body);
+
+    final uncleanUrls = doc.getElementsByTagName('a');
+  
+    for (var url in uncleanUrls) {
+      String? link = url.attributes['href'];
+      if (link != '#' && link != null) {
+
+        String key = url.text;
+
+        // Removes all non-alphanumeric chars and convert to camelCase.
+        this.allUrls[key] = link;
+      }
+    }
+  } 
+
+  Future<Map<String, dynamic>> getEnrolledCourses() async {
     
+    Uri url = Uri.parse(allUrls['Current Semester Registered Courses.']!);
+
+    final response = await session.get(url, headers: baseHeaders);
+    
+    Map<String, dynamic> enrolledCourses = ParseData.parseEnrolledCoursesData(response.body);
+
+    return enrolledCourses;
 
   }
 
@@ -277,7 +320,7 @@ void main() async {
 
   final ims = Ims();
   await ims.authenticate();
-  ims.getProfileData();
+  ims.getEnrolledCourses();
 
 
 }
