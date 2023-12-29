@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:collection/collection.dart';
 
 
 class ParseData {
@@ -61,4 +62,42 @@ class ParseData {
 
   }
 
+  static Map<String, Map<String, String>> parseAttandanceData(String htmlContent) {
+
+    final doc = parse(htmlContent);
+    final subjectTags = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr.plum_head')[2].querySelectorAll('td');
+
+    final subjects = subjectTags.sublist(1).map((tag) => tag.text).toList();
+
+    Map<String, Map<String, String>> data = Map.fromEntries(subjects.map((subject) => MapEntry(subject, {})));
+
+    final rows = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr');
+
+    for (final row in rows) {
+      if (!row.attributes.containsKey('class')) {
+
+        List<Element> tdTags = row.querySelectorAll('td');
+
+        if(tdTags.length > 2) {
+
+          List<String?> tdTagValues = tdTags.map((tag) => tag.text).toList();
+
+          String day = tdTagValues[0]!;
+          List<String?> attandanceData = tdTagValues.sublist(1);
+          
+          for (List<String?> pair in IterableZip([attandanceData, subjects])) {
+            String subject = pair[1]!;
+            String attandance = pair[0]!;
+
+            data[subject]![day] = attandance;
+          }
+
+        };
+      };
+    }
+    
+
+    return data;
+
+  }
 }

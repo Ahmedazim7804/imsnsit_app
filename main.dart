@@ -315,12 +315,51 @@ class Ims {
 
   }
 
+  Future<Map<String, dynamic>> getAttandanceData({String? rollNo, String? dept, String? degree}) async {
+
+    Uri url = Uri.parse(allUrls['Attendance Report']!);
+
+    Response response = await session.get(url, headers: baseHeaders);
+
+    final doc = parse(response.body);
+
+    String enc_year = doc.getElementById('enc_year')!.attributes['value']!;
+    String enc_sem = doc.getElementById('enc_sem')!.attributes['value']!;
+
+    if (rollNo == '' || dept == null || degree == null) {
+      
+      rollNo = doc.querySelector("[name=recentitycode]")!.attributes['value'];
+      dept = doc.querySelector("[name=dept]")!.attributes['value'];
+      degree = doc.querySelector("[name=degree]")!.attributes['value'];
+
+    }
+
+    Map<String, String> data = {
+            'year': '2023-24',
+            'enc_year': enc_year,
+            'sem': '1',
+            'enc_sem': enc_sem,
+            'submit': 'Submit',
+            'recentitycode': rollNo!,
+            'dept': dept!,
+            'degree': degree!,
+            'ename': '',
+            'ecode': '',
+    };
+
+    response = await session.post(url, headers: baseHeaders, data: data);
+    
+    final attandanceData = ParseData.parseAttandanceData(response.body);
+
+    return attandanceData;
+  }
+
 }
 void main() async {
 
   final ims = Ims();
   await ims.authenticate();
-  ims.getEnrolledCourses();
+  await ims.getAttandanceData();
 
 
 }
