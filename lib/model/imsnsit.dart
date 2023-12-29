@@ -1,99 +1,14 @@
 import 'dart:convert';
-import 'package:cookie_store/cookie_store.dart';
+import 'dart:typed_data';
 import 'package:html/dom.dart';
 import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
-import 'package:http/http.dart' as http;
+import 'package:imsnsit/model/session.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'dart:io';
 
 import 'parseData.dart';
-
-
-class Session {
-  final client = http.Client();
-  CookieStore cookies = CookieStore();
-
-  int maxRedirects;
-
-  Session({this.maxRedirects = 15}) {
-  }
-
-
-  Future<Response> get(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}}) async {
-    if (--redirectsLeft < 0) {
-      throw Exception('Too many Redirects');
-    }
-
-    headers['Cookie'] = getCookies(url);
-    
-    final response = await http.get(url, headers: headers);
-
-    updateCookies(response.headers, url);
-
-    if (response.headers.containsKey('location')) {
-      String? location = response.headers['location'];
-      headers['location'] = '';
-      if (location != null) {
-        final redirectUri = url.resolve(location);
-        
-        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
-      }
-    }
-
-    return response;
-  }
-
-  Future<Response> post(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}, Map<String, String> data = const{}}) async {
-    if (--redirectsLeft < 0) {
-      throw Exception('Too many Redirects');
-    }
-
-    headers['Cookie'] = getCookies(url);
-
-    final response = await http.post(url, headers: headers, body: data);
-
-    updateCookies(response.headers, url);
-
-    if (response.headers.containsKey('location')) {
-      String? location = response.headers['location'];
-      headers['location'] = '';
-      if (location != null) {
-        final redirectUri = url.resolve(location);
-        
-        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
-      }
-    }
-    
-    return response;
-  }
-
-  String getCookies(Uri url) {
-    String host = url.host;
-    String path = url.path;
-
-    if (host.substring(0, 4) == 'www.') {
-      host = host.substring(4);
-    }
-
-    String cookieHeader = CookieStore.buildCookieHeader(cookies.getCookiesForRequest(host, path));
-
-    return cookieHeader;
-  }
-
-  void updateCookies(Map<String, String> headers, Uri url) {
-    String? rawCookies = headers['set-cookie'];
-    if (rawCookies != null) {
-      String host = url.host;
-      String path = url.path;
-
-      if (host.substring(0, 4) == 'www.') {
-        host = host.substring(4);
-      }
-      cookies.updateCookies(rawCookies, host, path);
-    }
-  }
-
-}
 
 class Ims {
   
@@ -119,12 +34,12 @@ class Ims {
   Map<String, dynamic> allUrls = {};
   final Session session = Session();
   bool isAuthenticated = false;
+  String? hrandNum;
    
   
   Future<void> getSessionAttributes() async {
 
-    final file = await File('data.json');
-    final fileContent = await file.readAsString();
+    final fileContent = await rootBundle.loadString('assets/data.json');
 
     Map<String, dynamic> jsonContent = jsonDecode(fileContent);
   
@@ -133,24 +48,24 @@ class Ims {
     }
     
     if (jsonContent.containsKey('profileUrl') && jsonContent['profileUrl'] != null) {
-      this.profileUrl = jsonContent['profileUrl'];
+      profileUrl = jsonContent['profileUrl'];
     }
 
     if (jsonContent.containsKey('myActivitiesUrl') && jsonContent['myActivitiesUrl'] != null) {
-      this.myActivitiesUrl = jsonContent['myActivitiesUrl'];
+      myActivitiesUrl = jsonContent['myActivitiesUrl'];
     }
 
     if (jsonContent.containsKey('referrer') && jsonContent['referrer'] != null) {
-      this.referrer = jsonContent['referrer'];
+      referrer = jsonContent['referrer'];
     }
 
     if (jsonContent.containsKey('allUrls') && jsonContent['allUrls'] != null) {
-      this.allUrls = jsonContent['allUrls'];
+      allUrls = jsonContent['allUrls'];
     }
   } 
 
   void store(Map<String, dynamic> data) async {
-    final file = await File('data.json');
+    final file = File('data.json');
 
     var fileContent = await file.readAsString();
 
@@ -164,10 +79,9 @@ class Ims {
   }
 
   Future<bool> isUserAuthenticated() async {
-    await getSessionAttributes();
     
       try {
-        this.baseHeaders.addAll(
+        baseHeaders.addAll(
             {
               'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php'
             }
@@ -184,18 +98,21 @@ class Ims {
     return true;
   }
 
-  Future<void> authenticate() async {
+  Future<void> getInitialData() async {
+    await getSessionAttributes();
+
+    await session.get(baseUrl, headers: baseHeaders);
+    
+  }
+
+  Future<void> authenticate(String cap) async {
 
     if (await isUserAuthenticated()) {
       isAuthenticated = true;
       return;
     }
-    
-    await session.get(this.baseUrl, headers: this.baseHeaders);
 
-    var (String captchaImage, String hrandNum) = await getCaptcha();
-
-    this.baseHeaders.addAll(
+    baseHeaders.addAll(
       {
         'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php',
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -205,14 +122,13 @@ class Ims {
       }
     );
 
-    print("Enter The Captcha $captchaImage : ");
-    final cap = await stdin.readLineSync();
+    final cap = stdin.readLineSync();
     
     Map<String, String> data = {
             'f': '',
             'uid': '***REMOVED***',
             'pwd': '***REMOVED***',
-            'HRAND_NUM': hrandNum,
+            'HRAND_NUM': hrandNum!,
             'fy': '2023-24',
             'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
             'cap': cap!,
@@ -248,13 +164,14 @@ class Ims {
 
   }
 
-  Future<(String, String)> getCaptcha() async {
-
-    this.baseHeaders.addAll({
+  Future<Uint8List> getCaptcha() async {
+    await getInitialData();
+    
+    baseHeaders.addAll({
           'Referer': 'https://www.imsnsit.org/imsnsit/',
           'Sec-Fetch-User': '?1'
           });
-
+    
     var response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login110.php'), headers: baseHeaders);
     response = await session.get(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders);
 
@@ -264,19 +181,20 @@ class Ims {
     captchaImage = Uri.parse(baseUrl.toString()).resolve(captchaImage!).toString();
     String? hrand = doc.getElementById('HRAND_NUM')!.attributes['value'];
 
-    return (captchaImage, hrand!);
+    hrandNum = hrand;
+    
+    response = await session.get(Uri.parse(captchaImage), headers: baseHeaders);
+
+    return response.bodyBytes;
   }
 
   Future<Map<String, String>> getProfileData() async {
-    if (!isAuthenticated) {
-      authenticate();
-    }
 
     baseHeaders.addAll({
               'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php'
             });
 
-    final response = await session.get(Uri.parse(profileUrl!), headers: this.baseHeaders);
+    final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
 
     final profileData = ParseData.parseProfileData(response.body);
 
@@ -285,7 +203,7 @@ class Ims {
 
   Future<void> getAllUrls() async {
 
-    final response = await session.get(Uri.parse(myActivitiesUrl!), headers: this.baseHeaders);
+    final response = await session.get(Uri.parse(myActivitiesUrl!), headers: baseHeaders);
 
     final doc = parse(response.body);
 
@@ -298,7 +216,7 @@ class Ims {
         String key = url.text;
 
         // Removes all non-alphanumeric chars and convert to camelCase.
-        this.allUrls[key] = link;
+        allUrls[key] = link;
       }
     }
   } 
@@ -323,8 +241,8 @@ class Ims {
 
     final doc = parse(response.body);
 
-    String enc_year = doc.getElementById('enc_year')!.attributes['value']!;
-    String enc_sem = doc.getElementById('enc_sem')!.attributes['value']!;
+    String encYear = doc.getElementById('enc_year')!.attributes['value']!;
+    String encSem = doc.getElementById('enc_sem')!.attributes['value']!;
 
     if (rollNo == '' || dept == null || degree == null) {
       
@@ -336,9 +254,9 @@ class Ims {
 
     Map<String, String> data = {
             'year': '2023-24',
-            'enc_year': enc_year,
+            'enc_year': encYear,
             'sem': '1',
-            'enc_sem': enc_sem,
+            'enc_sem': encSem,
             'submit': 'Submit',
             'recentitycode': rollNo!,
             'dept': dept!,
@@ -355,11 +273,9 @@ class Ims {
   }
 
 }
-void main() async {
 
-  final ims = Ims();
-  await ims.authenticate();
-  await ims.getAttandanceData();
+void main() {
+  Ims ims = Ims();
 
-
+  ims.getCaptcha();
 }
