@@ -65,14 +65,28 @@ class Session {
   }
 
   String getCookies(Uri url) {
-    String cookieHeader = CookieStore.buildCookieHeader(cookies.getCookiesForRequest(url.host, url.path));
+    String host = url.host;
+    String path = url.path;
+
+    if (host.substring(0, 4) == 'www.') {
+      host = host.substring(4);
+    }
+
+    String cookieHeader = CookieStore.buildCookieHeader(cookies.getCookiesForRequest(host, path));
+
     return cookieHeader;
   }
 
   void updateCookies(Map<String, String> headers, Uri url) {
     String? rawCookies = headers['set-cookie'];
     if (rawCookies != null) {
-      cookies.updateCookies(rawCookies, url.host, url.path);
+      String host = url.host;
+      String path = url.path;
+
+      if (host.substring(0, 4) == 'www.') {
+        host = host.substring(4);
+      }
+      cookies.updateCookies(rawCookies, host, path);
     }
   }
 
@@ -98,6 +112,7 @@ class Ims {
 
   String? profileUrl;
   String? myActivitiesUrl;
+  String? referrer;
   List<String> allUrls = [];
   final Session session = Session();
   bool isAuthenticated = false;
@@ -111,15 +126,19 @@ class Ims {
     Map<String, dynamic> jsonContent = jsonDecode(fileContent);
   
     if (jsonContent.keys.contains('cookies')) {
-      session.cookies.updateCookies(jsonContent['cookies'], 'imsnsit.org', '/');
+      session.cookies = CookieStore()..updateCookies(jsonContent['cookies'], 'imsnsit.org', '/');
     }
-    print(jsonContent.keys);
+    
     if (jsonContent.containsKey('profileUrl') && jsonContent['profileUrl'] != null) {
       this.profileUrl = jsonContent['profileUrl'];
     }
 
     if (jsonContent.containsKey('myActivitiesUrl') && jsonContent['myActivitiesUrl'] != null) {
       this.myActivitiesUrl = jsonContent['myActivitiesUrl'];
+    }
+
+    if (jsonContent.containsKey('referrer') && jsonContent['referrer'] != null) {
+      this.referrer = jsonContent['referrer'];
     }
   } 
 
@@ -139,10 +158,15 @@ class Ims {
 
   Future<bool> isUserAuthenticated() async {
     await getSessionAttributes();
-    print(session.cookies.cookies);
+    
       try {
+        this.baseHeaders.addAll(
+            {
+              'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php'
+            }
+          );
         final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
-
+        
         if (response.body.contains('Session expired')) {
           return false;
         }
@@ -159,7 +183,7 @@ class Ims {
       isAuthenticated = true;
       return;
     }
-
+    
     await session.get(this.baseUrl, headers: this.baseHeaders);
 
     var (String captchaImage, String hrandNum) = await getCaptcha();
@@ -190,6 +214,8 @@ class Ims {
 
     var response = await session.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, data: data);
     
+    referrer = response.request!.url.toString();
+
     final doc = parse(response.body);
     final List links = doc.getElementsByTagName('a');
     for (Element link in links) {
@@ -204,7 +230,8 @@ class Ims {
     store({
       'cookies': session.getCookies(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
       'profileUrl': profileUrl!,
-      'myActivitiesUrl': myActivitiesUrl!
+      'myActivitiesUrl': myActivitiesUrl!,
+      'referrer': referrer!
     });
 
     isAuthenticated = true;
@@ -234,42 +261,23 @@ class Ims {
     if (!isAuthenticated) {
       authenticate();
     }
-    print(profileUrl);
-    final response = await http.get(Uri.parse(profileUrl!), headers: baseHeaders);
-    print(response.body);
+
+    baseHeaders.addAll({
+              'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php'
+            });
+
+    final response = await session.get(Uri.parse(profileUrl!), headers: this.baseHeaders);
+
+    
+
   }
 
 }
 void main() async {
 
-  // final ims = Ims();
-  // await ims.authenticate();
-  // ims.getProfileData();
-
-
-  final headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.119 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Accept-Encoding': 'gzip, deflate, br',
-    //'Referer': 'https://www.imsnsit.org/imsnsit/plum_url.php?xS8C9E3DSlqtqdmz1vDdC+8QlIk4lWi6nzu8ujac4HB9DQxz9vD/KnyhycO5HA1pkhGH+jvvgZoKNcATZMpgmQ==',
-    'Connection': 'keep-alive',
-    'Cookie': 'PHPSESSID=53hljq61cst22vdcchj951jtl6',
-    'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'frame',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'same-origin',
-    'Sec-Fetch-User': '?1',
-    'Accept-Encoding': 'gzip',
-  };
-
-  final url = Uri.parse('https://www.imsnsit.org/imsnsit/plum_url.php?tXSfLx1qF8T2Een4lOffgVuX/+thUqgUtWXVKyN+rH5ebsz02HawOqP4jnwsz0DCHu843s8Alnpp97X1jzO0Z9MqlHj0UnN7c3DH38y+HBE=');
-
-  final res = await http.get(url, headers: headers);
-  final status = res.statusCode;
-  if (status != 200) throw Exception('http.get error: statusCode= $status');
-  print(res.request!.url);
-  print(res.body);
+  final ims = Ims();
+  await ims.authenticate();
+  ims.getProfileData();
 
 
 }
