@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication_screen.dart';
+import 'package:imsnsit/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
 ColorScheme colorScheme = ColorScheme.fromSeed(
@@ -15,24 +16,25 @@ void main() {
     darkTheme: ThemeData.dark().copyWith(
         colorScheme: colorScheme
         ),
-    home: Scaffold(
-      body: ChangeNotifierProvider(
-        create: (context) => ImsProvider(),
-        child: Consumer<ImsProvider>(builder: (context, ImsProvider, child) {
+    home: const Scaffold(
+      body: LoginScreen(),
+      // body: ChangeNotifierProvider(
+      //   create: (context) => ImsProvider(),
+      //   child: Consumer<ImsProvider>(builder: (context, ImsProvider, child) {
 
-          return FutureBuilder(
-            future: ImsProvider.ims.getInitialData(),
-            builder: (context, snapshot) {
+      //     return FutureBuilder(
+      //       future: ImsProvider.ims.getInitialData(),
+      //       builder: (context, snapshot) {
 
-              if (snapshot.connectionState == ConnectionState.done) {
-                return const AuthenticationScreen();
-              } else {
-                return const CircularProgressIndicator();
-              }
-            });
+      //         if (snapshot.connectionState == ConnectionState.done) {
+      //           return const AuthenticationScreen();
+      //         } else {
+      //           return const CircularProgressIndicator();
+      //         }
+      //       });
 
-        }),
-      ),
+      //   }),
+      // ),
     ),
   ));
 }
