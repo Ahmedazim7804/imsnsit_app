@@ -5,6 +5,7 @@ import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
 import 'package:imsnsit/model/session.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:io';
 
@@ -39,43 +40,43 @@ class Ims {
   
   Future<void> getSessionAttributes() async {
 
-    final fileContent = await rootBundle.loadString('assets/data.json');
-
-    Map<String, dynamic> jsonContent = jsonDecode(fileContent);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
   
-    if (jsonContent.keys.contains('cookies')) {
-      session.cookies = CookieStore()..updateCookies(jsonContent['cookies'], 'imsnsit.org', '/');
+    if (prefs.getKeys().contains('cookies') && prefs.getString('cookies') != null) {
+      session.cookies = CookieStore()..updateCookies(prefs.getString('cookies')!, 'imsnsit.org', '/');
     }
     
-    if (jsonContent.containsKey('profileUrl') && jsonContent['profileUrl'] != null) {
-      profileUrl = jsonContent['profileUrl'];
+    if (prefs.getKeys().contains('profileUrl') && prefs.getString('profileUrl') != null) {
+      profileUrl = prefs.getString('profileUrl');
     }
 
-    if (jsonContent.containsKey('myActivitiesUrl') && jsonContent['myActivitiesUrl'] != null) {
-      myActivitiesUrl = jsonContent['myActivitiesUrl'];
+    if (prefs.getKeys().contains('myActivitiesUrl') && prefs.getString('myActivitiesUrl') != null) {
+      myActivitiesUrl = prefs.getString('myActivitiesUrl');
     }
 
-    if (jsonContent.containsKey('referrer') && jsonContent['referrer'] != null) {
-      referrer = jsonContent['referrer'];
+    if (prefs.getKeys().contains('referrer') && prefs.getString('referrer') != null) {
+      referrer = prefs.getString('referrer');
     }
 
-    if (jsonContent.containsKey('allUrls') && jsonContent['allUrls'] != null) {
-      allUrls = jsonContent['allUrls'];
+    if (prefs.getKeys().contains('allUrls') && prefs.getString('allUrls') != null) {
+      String stringAllUrls = prefs.getString('allUrls')!;
+      allUrls = jsonDecode(stringAllUrls);
     }
   } 
 
   void store(Map<String, dynamic> data) async {
-    final file = File('data.json');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    for (final items in data.entries) {
+      final key = items.key;
+      final value = items.value;
 
-    var fileContent = await file.readAsString();
-
-    Map<String, dynamic> jsonData = jsonDecode(fileContent);
-
-    jsonData.addAll(data);
-
-    fileContent = jsonEncode(jsonData);
-
-    file.writeAsString(fileContent);
+      if (value.runtimeType != String) {
+        prefs.setString(key, jsonEncode(value));
+      } else {
+        prefs.setString(key, value);
+      }
+    }
   }
 
   Future<bool> isUserAuthenticated() async {
@@ -86,8 +87,8 @@ class Ims {
               'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php'
             }
           );
-        final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
         
+        final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
         if (response.body.contains('Session expired')) {
           return false;
         }
@@ -109,6 +110,7 @@ class Ims {
 
     if (await isUserAuthenticated()) {
       isAuthenticated = true;
+      print("Already Loged in.....");
       return;
     }
 
@@ -121,8 +123,6 @@ class Ims {
         'Sec-Fetch-Dest': 'frame',
       }
     );
-
-    final cap = stdin.readLineSync();
     
     Map<String, String> data = {
             'f': '',
@@ -131,7 +131,7 @@ class Ims {
             'HRAND_NUM': hrandNum!,
             'fy': '2023-24',
             'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
-            'cap': cap!,
+            'cap': cap,
             'logintype': 'student',
         };
 
@@ -149,7 +149,6 @@ class Ims {
         myActivitiesUrl = link.attributes['href'];
       }
     }
-
     await getAllUrls();
 
     store({
@@ -165,7 +164,6 @@ class Ims {
   }
 
   Future<Uint8List> getCaptcha() async {
-    await getInitialData();
     
     baseHeaders.addAll({
           'Referer': 'https://www.imsnsit.org/imsnsit/',
