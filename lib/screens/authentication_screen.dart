@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/captcha_screen.dart';
 import 'package:imsnsit/screens/homescreen.dart';
 import 'package:imsnsit/model/imsnsit.dart';
@@ -22,7 +23,7 @@ class AuthenticationScreen extends StatelessWidget {
           bool isAuthenticated = snaphot.data!;
           
           if (isAuthenticated) {
-            return const HomeScreen();
+            return const AttandanceScreen();
           } else {
             return const CaptchaScreen();
           }

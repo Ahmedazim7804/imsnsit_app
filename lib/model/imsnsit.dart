@@ -4,10 +4,7 @@ import 'package:html/dom.dart';
 import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
 import 'package:imsnsit/model/session.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'dart:io';
 
 import 'parseData.dart';
 
@@ -80,7 +77,7 @@ class Ims {
   }
 
   Future<bool> isUserAuthenticated() async {
-    
+      
       try {
         baseHeaders.addAll(
             {
@@ -231,7 +228,7 @@ class Ims {
 
   }
 
-  Future<Map<String, dynamic>> getAttandanceData({String? rollNo, String? dept, String? degree}) async {
+  Future<Map<String, dynamic>> getAbsoulteAttandanceData({String? rollNo, String? dept, String? degree}) async {
 
     Uri url = Uri.parse(allUrls['Attendance Report']!);
 
@@ -265,7 +262,48 @@ class Ims {
 
     response = await session.post(url, headers: baseHeaders, data: data);
     
-    final attandanceData = ParseData.parseAttandanceData(response.body);
+    final attandanceData = ParseData.parseAbsoluteAttandanceData(response.body);
+
+    return attandanceData;
+  }
+
+  Future<Map<String, dynamic>> getAttandanceData({String? rollNo, String? dept, String? degree}) async {
+
+    Uri url = Uri.parse(allUrls['Attendance Report']!);
+
+    Response response = await session.get(url, headers: baseHeaders);
+
+    final doc = parse(response.body);
+
+    String encYear = doc.getElementById('enc_year')!.attributes['value']!;
+    String encSem = doc.getElementById('enc_sem')!.attributes['value']!;
+
+    if (rollNo == '' || dept == null || degree == null) {
+      
+      rollNo = doc.querySelector("[name=recentitycode]")!.attributes['value'];
+      dept = doc.querySelector("[name=dept]")!.attributes['value'];
+      degree = doc.querySelector("[name=degree]")!.attributes['value'];
+
+    }
+
+    Map<String, String> data = {
+            'year': '2023-24',
+            'enc_year': encYear,
+            'sem': '1',
+            'enc_sem': encSem,
+            'submit': 'Submit',
+            'recentitycode': rollNo!,
+            'dept': dept!,
+            'degree': degree!,
+            'ename': '',
+            'ecode': '',
+    };
+
+    response = await session.post(url, headers: baseHeaders, data: data);
+
+    Map<String, dynamic> courses = await getEnrolledCourses();
+    
+    final attandanceData = ParseData.parseAttandanceData(response.body, courses);
 
     return attandanceData;
   }

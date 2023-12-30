@@ -62,7 +62,7 @@ class ParseData {
 
   }
 
-  static Map<String, Map<String, String>> parseAttandanceData(String htmlContent) {
+  static Map<String, Map<String, String>> parseAbsoluteAttandanceData(String htmlContent) {
 
     final doc = parse(htmlContent);
     final subjectTags = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr.plum_head')[2].querySelectorAll('td');
@@ -92,8 +92,40 @@ class ParseData {
             data[subject]![day] = attandance;
           }
 
-        };
-      };
+        }
+      }
+    }
+    
+
+    return data;
+
+  }
+
+  static Map<String, Map<String, String>> parseAttandanceData(String htmlContent, Map<String, dynamic> courses) {
+
+    final doc = parse(htmlContent);
+    final subjectTags = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr.plum_head')[2].querySelectorAll('td');
+
+    final subjects = subjectTags.sublist(1).map((tag) => tag.text).toList();
+
+    Map<String, Map<String, String>> data = Map.fromEntries(subjects.map((subject) => MapEntry(subject, {'name': courses[subject]['subjectName']})));
+
+    final allRows = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr.plum_head');
+    final requiredRows = allRows.sublist(allRows.length-4);
+
+    for (final row in requiredRows) {
+      List<Element> tdTags = row.querySelectorAll('td');
+      List<String?> tdTagValues = tdTags.map((tag) => tag.text).toList();
+      
+      String key = tdTagValues[0]!;
+      List<String?> values = tdTagValues.sublist(1);
+
+      for (List<String?> pair in IterableZip([values, subjects])) {
+            String subject = pair[1]!;
+            String value = pair[0]!;
+
+            data[subject]![key] = value;
+      }
     }
     
 
