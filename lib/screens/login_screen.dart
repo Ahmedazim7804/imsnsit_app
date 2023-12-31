@@ -1,11 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/screens/attandance_screen.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:imsnsit/model/functions.dart';
+import 'package:imsnsit/model/imsnsit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
 
   Widget popup(BuildContext context) {
+
     return AlertDialog(
       backgroundColor: const Color.fromARGB(255, 169, 37, 16),
       title: Text('An error has occured', style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),),
@@ -17,18 +30,58 @@ class LoginScreen extends StatelessWidget {
     );
   } 
 
+  Future<String> performOcr(String imagePath) async {
+
+    String text = await FlutterTesseractOcr.extractText(
+        imagePath,
+        language: 'mydigits',
+        args: {
+          "psm": "11",
+        }
+        );
+    
+    return text;
+
+  }
+
   @override
   Widget build(BuildContext context) {
 
     TextEditingController usernameController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
 
-    void onSubmit() {
+    final ims = Provider.of<ImsProvider>(context).ims;
+
+    void goToAttandanceScreen() {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext ctx) =>const AttandanceScreen()));
+    }
+
+    void showErrorDialog() {
+      showDialog(context: context, builder: (context) => popup(context));
+    }
+
+    void onSubmit(Ims ims) async {
+      
+      String imageUrl = await ims.getCaptcha();
+      String imagePath = await Functions.downloadFile(imageUrl);
+      
+      String captchaText = await performOcr(imagePath); 
+
       String username = usernameController.text;
       String password = passwordController.text;
+      
+      await ims.authenticate(captchaText, username, password);
+      
+      if (ims.isAuthenticated) {
 
-      showDialog(context: context, builder: popup);
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('username', username);
+        prefs.setString('password', password);
 
+        goToAttandanceScreen();
+      } else {
+        showErrorDialog();
+      }
     }
 
     return Center(
@@ -73,7 +126,9 @@ class LoginScreen extends StatelessWidget {
               ),),
           ),
           ElevatedButton(
-            onPressed: onSubmit, 
+            onPressed: () async {
+              onSubmit(ims);
+            }, 
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))

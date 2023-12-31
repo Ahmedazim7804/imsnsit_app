@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imsnsit/model/imsnsit.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 class CaptchaScreen extends StatelessWidget {
@@ -10,7 +11,11 @@ class CaptchaScreen extends StatelessWidget {
 
     String cap = controller.text;
     
-    ims.authenticate(cap);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username')!;
+    String password = prefs.getString('password')!;
+
+    ims.authenticate(cap, username, password);
 
   }
 
@@ -50,7 +55,7 @@ class CaptchImage extends StatelessWidget {
 
         if (snapshot.hasData) {
         
-          return Image.memory(snapshot.data!);
+          return Image.asset(snapshot.data!);
         
         } else {
           return const Text('Loading....');
