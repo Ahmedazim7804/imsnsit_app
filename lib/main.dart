@@ -4,6 +4,7 @@ import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication_screen.dart';
 import 'package:imsnsit/screens/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:imsnsit/myapp.dart';
 
 ColorScheme colorScheme = ColorScheme.fromSeed(
     seedColor: const Color.fromARGB(255, 140, 1, 248),
@@ -11,30 +12,16 @@ ColorScheme colorScheme = ColorScheme.fromSeed(
     brightness: Brightness.dark);
 
 void main() {
-  runApp(MaterialApp(
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => ImsProvider())
+    ],
+    child: MaterialApp(
     themeMode: ThemeMode.dark,
     darkTheme: ThemeData.dark().copyWith(
         colorScheme: colorScheme
         ),
-    home: const Scaffold(
-      body: LoginScreen(),
-      // body: ChangeNotifierProvider(
-      //   create: (context) => ImsProvider(),
-      //   child: Consumer<ImsProvider>(builder: (context, ImsProvider, child) {
-
-      //     return FutureBuilder(
-      //       future: ImsProvider.ims.getInitialData(),
-      //       builder: (context, snapshot) {
-
-      //         if (snapshot.connectionState == ConnectionState.done) {
-      //           return const AuthenticationScreen();
-      //         } else {
-      //           return const CircularProgressIndicator();
-      //         }
-      //       });
-
-      //   }),
-      // ),
-    ),
-  ));
+    home: const MyApp()
+  )
+    ));
 }

@@ -4,6 +4,7 @@ import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/captcha_screen.dart';
 import 'package:imsnsit/screens/homescreen.dart';
 import 'package:imsnsit/model/imsnsit.dart';
+import 'package:imsnsit/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
 class AuthenticationScreen extends StatelessWidget {
@@ -25,7 +26,11 @@ class AuthenticationScreen extends StatelessWidget {
           if (isAuthenticated) {
             return const AttandanceScreen();
           } else {
-            return const CaptchaScreen();
+            if (ims.username != null && ims.password != null) {
+              return const CaptchaScreen();
+            } else {
+              return const LoginScreen();
+            }
           }
 
         } else {

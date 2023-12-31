@@ -9,9 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'parseData.dart';
 
 class Ims {
-  
-  final String username = '';
-  final String password = '';
+
+  String? username;
+  String? password;
 
   final Map<String, String> baseHeaders = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.119 Safari/537.36',
@@ -59,6 +59,14 @@ class Ims {
       String stringAllUrls = prefs.getString('allUrls')!;
       allUrls = jsonDecode(stringAllUrls);
     }
+
+    if (prefs.getKeys().contains('username') && prefs.getString('username') != null) {
+      username = prefs.getString('username');
+    }
+
+    if (prefs.getKeys().contains('password') && prefs.getString('password') != null) {
+      password = prefs.getString('password');
+    }
   } 
 
   void store(Map<String, dynamic> data) async {
@@ -103,7 +111,7 @@ class Ims {
     
   }
 
-  Future<void> authenticate(String cap) async {
+  Future<void> authenticate(String cap, String username, String password) async {
 
     if (await isUserAuthenticated()) {
       isAuthenticated = true;
@@ -123,8 +131,8 @@ class Ims {
     
     Map<String, String> data = {
             'f': '',
-            'uid': '***REMOVED***',
-            'pwd': '***REMOVED***',
+            'uid': username,
+            'pwd': password,
             'HRAND_NUM': hrandNum!,
             'fy': '2023-24',
             'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
@@ -149,6 +157,8 @@ class Ims {
     await getAllUrls();
 
     store({
+      'username': username,
+      'password': password,
       'cookies': session.getCookies(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
       'profileUrl': profileUrl!,
       'myActivitiesUrl': myActivitiesUrl!,
@@ -160,7 +170,7 @@ class Ims {
 
   }
 
-  Future<Uint8List> getCaptcha() async {
+  Future<String> getCaptcha() async {
     
     baseHeaders.addAll({
           'Referer': 'https://www.imsnsit.org/imsnsit/',
@@ -178,9 +188,7 @@ class Ims {
 
     hrandNum = hrand;
     
-    response = await session.get(Uri.parse(captchaImage), headers: baseHeaders);
-
-    return response.bodyBytes;
+    return captchaImage;
   }
 
   Future<Map<String, String>> getProfileData() async {
