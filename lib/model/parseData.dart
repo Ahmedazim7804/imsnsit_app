@@ -150,4 +150,43 @@ class ParseData {
     return data;
 
   }
+
+  static Map<String, List<String>> parseRoomData(String htmlContent) {
+
+    final doc = parse(htmlContent);
+    final rows = doc.querySelectorAll('tr');
+
+    Map<String, List<String>> data = {};
+
+    final timesTags = rows[2].querySelectorAll('td').sublist(3,11);
+    List<String> times = [];
+
+    for (Element tag in timesTags) {
+      final tagText = tag.querySelector('b');
+      String time = tagText!.innerHtml.split('<br>')[1];
+      times.add(time);
+    }
+
+    for (Element row in rows.sublist(3, 7)) {
+
+      final allCells = row.querySelectorAll('td');
+
+      String day = allCells[0].text;
+      final cellTexts = allCells.sublist(3, 11).map((element) => element.text).toList();
+
+      for (List<String?> pair in IterableZip([times, cellTexts])) {
+        String time = pair[0]!;
+
+        if (pair[1]!.trim().isEmpty) {
+          if (data.containsKey(day)) {
+            data[day]!.add(time);
+          } else {
+            data[day] = [time];
+          }
+        }
+      }
+    }
+
+    return data;
+  }
 }

@@ -319,6 +319,61 @@ class Ims {
     return attandanceData;
   }
 
+  Future<void> roomsList() async {
+
+    Map<String, Map<String, List<String>>> allRoomsData = {};
+
+    List<String> rooms = [
+      'APJ-01',
+      'APJ-02',
+      'APJ-03',
+      'APJ-04',
+      'APJ-05',
+      'APJ-06',
+      'APJ-07',
+      'APJ-08',
+      'APJ-09',
+      'APJ-10',
+      'APJ-11',
+    ];
+
+    final headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.119 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.5',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Referer': myActivitiesUrl!,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Origin': 'https://www.imsnsit.org',
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+      'Sec-Fetch-Dest': 'frame',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'same-origin',
+      'Sec-Fetch-User': '?1',
+      'Accept-Encoding': 'gzip',
+    };
+
+    final url = Uri.parse('https://www.imsnsit.org/imsnsit/plum_url.php?Xa9HvscdKyH6kL9nKIyCD80Af4YmbpJSlN4qzyQsnhEW752gaaBRKjC5B+5SgxUWzRm0BuyJ0EuNJ8BxklMF6Vjet5gq8CLaWdFN9qBzeu0pGzfeTxg0MznYdBq2W4O3sKNiJJKtD7BpHz30vozHgOKP0ezxpMWh2PtNzR3g6yU');
+
+    for (String room in rooms) {
+
+      final data = {
+        'roomcode': room,
+        'room': room,
+        'semcmb': '2-4-6-8',
+        'enc_semcmb': 'P0RYCVYHDvjv4ZWnV+lsiPiOE6wbkYUVXnt1gj7ut/9uyy0d8ZkKWDvCKeeG1r0F',
+        'submit': 'Go',
+      };
+
+      final res = await session.post(url, headers: headers, data: data);
+      Map<String, List<String>> roomData = ParseData.parseRoomData(res.body);
+
+      allRoomsData[room] = roomData;
+
+    }
+  }
+
 }
 
 void main() {
