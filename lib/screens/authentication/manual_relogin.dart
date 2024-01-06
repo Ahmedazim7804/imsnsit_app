@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
@@ -10,7 +9,6 @@ import 'package:imsnsit/model/imsnsit.dart';
 import 'package:imsnsit/screens/screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-@RoutePage()
 class ManualRelogin extends StatelessWidget {
   const ManualRelogin({super.key});
 
