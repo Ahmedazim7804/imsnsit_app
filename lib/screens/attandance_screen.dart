@@ -55,7 +55,7 @@ class AttandanceScreen extends StatelessWidget {
     future: Provider.of<ImsProvider>(context).ims.getAttandanceData(), 
     builder: (context, snapshot) {
       if (snapshot.hasData) {
-
+        print('sdsdsdsd');
         List<SubjectAttandance> subjectAttandance = snapshot.data!.entries.map((entry) => SubjectAttandance(entry: entry)).toList();
 
         return Center(

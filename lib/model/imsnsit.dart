@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -283,7 +284,6 @@ class Ims {
     Uri url = Uri.parse(allUrls['Attendance Report']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
-
     final doc = parse(response.body);
 
     String encYear = doc.getElementById('enc_year')!.attributes['value']!;
@@ -309,9 +309,8 @@ class Ims {
             'ename': '',
             'ecode': '',
     };
-
+    
     response = await session.post(url, headers: baseHeaders, data: data);
-
     Map<String, dynamic> courses = await getEnrolledCourses();
     
     final attandanceData = ParseData.parseAttandanceData(response.body, courses);
@@ -319,22 +318,20 @@ class Ims {
     return attandanceData;
   }
 
-  Future<void> roomsList() async {
-
-    Map<String, Map<String, List<String>>> allRoomsData = {};
-
+  Future<void> roomsList({required StreamController streamController}) async {
+    Map<String, Map<String, List<String>>> ww = {};
     List<String> rooms = [
       'APJ-01',
-      'APJ-02',
-      'APJ-03',
-      'APJ-04',
-      'APJ-05',
-      'APJ-06',
-      'APJ-07',
-      'APJ-08',
-      'APJ-09',
-      'APJ-10',
-      'APJ-11',
+      // 'APJ-02',
+      // 'APJ-03',
+      // 'APJ-04',
+      // 'APJ-05',
+      // 'APJ-06',
+      // 'APJ-07',
+      // 'APJ-08',
+      // 'APJ-09',
+      // 'APJ-10',
+      // 'APJ-11',
     ];
 
     final headers = {
@@ -369,7 +366,8 @@ class Ims {
       final res = await session.post(url, headers: headers, data: data);
       Map<String, List<String>> roomData = ParseData.parseRoomData(res.body);
 
-      allRoomsData[room] = roomData;
+      ww[room] = roomData;
+      streamController.sink.add(ww);
 
     }
   }
