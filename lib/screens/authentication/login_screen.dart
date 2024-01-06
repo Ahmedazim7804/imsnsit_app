@@ -1,18 +1,14 @@
-import 'dart:io';
-
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:imsnsit/provider/ims_provider.dart';
-import 'package:imsnsit/screens/attandance_screen.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/model/imsnsit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:imsnsit/screens/screens.dart';
 
-
+@RoutePage()
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -30,19 +26,6 @@ class LoginScreen extends StatelessWidget {
     );
   } 
 
-  Future<String> performOcr(String imagePath) async {
-
-    String text = await FlutterTesseractOcr.extractText(
-        imagePath,
-        language: 'mydigits',
-        args: {
-          "psm": "11",
-        }
-        );
-    
-    return text;
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +34,6 @@ class LoginScreen extends StatelessWidget {
     TextEditingController passwordController = TextEditingController();
 
     final ims = Provider.of<ImsProvider>(context).ims;
-
-    void goToAttandanceScreen() {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext ctx) =>const AttandanceScreen()));
-    }
 
     void showErrorDialog() {
       showDialog(context: context, builder: (context) => popup(context));
@@ -65,7 +44,7 @@ class LoginScreen extends StatelessWidget {
       String imageUrl = await ims.getCaptcha();
       String imagePath = await Functions.downloadFile(imageUrl);
       
-      String captchaText = await performOcr(imagePath); 
+      String captchaText = await Functions.performOcr(imagePath); 
 
       String username = usernameController.text;
       String password = passwordController.text;
@@ -78,7 +57,7 @@ class LoginScreen extends StatelessWidget {
         prefs.setString('username', username);
         prefs.setString('password', password);
 
-        goToAttandanceScreen();
+        Screens.goToAttandanceScreen(context);
       } else {
         showErrorDialog();
       }
