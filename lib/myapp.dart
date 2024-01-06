@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
-import 'package:imsnsit/screens/attandance_screen.dart';
-import 'package:imsnsit/screens/authentication/authentication_screen.dart';
-import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
@@ -10,16 +8,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-            future: context.read<ImsProvider>().ims.getInitialData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return const AuthenticationScreen();
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            })
+    context.read<ImsProvider>().ims.getInitialData().then((data) => context.go('/authentication/authentication_screen'));
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator(),)
     );
   }
 }

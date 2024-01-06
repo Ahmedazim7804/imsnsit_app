@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/model/imsnsit.dart';
-import 'package:imsnsit/screens/screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ManualRelogin extends StatelessWidget {
@@ -23,9 +23,9 @@ class ManualRelogin extends StatelessWidget {
     await ims.authenticate(captchaText, username, password);
 
     if (ims.isAuthenticated) {
-      Screens.goToAttandanceScreen(context);
+      context.go('/rooms');
     } else {
-      Screens.goToManualReloginScreen(context);
+      context.go('/authentication/manual_login');
     }
 
   }

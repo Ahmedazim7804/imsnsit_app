@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/router/router.dart';
 import 'package:provider/provider.dart';
-import 'package:imsnsit/myapp.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
 
 ThemeData catppuccinTheme(Flavor flavor) {
@@ -47,10 +47,12 @@ void main() {
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => ImsProvider())
     ],
-    child: MaterialApp(
+    child: MaterialApp.router(
     themeMode: ThemeMode.dark,
     theme: catppuccinTheme(catppuccin.mocha),
-    home: const MyApp()
+    routeInformationParser: MyAppRouter.router.routeInformationParser,
+    routerDelegate: MyAppRouter.router.routerDelegate,
+    routeInformationProvider: MyAppRouter.router.routeInformationProvider,
   )
     ));
 }
