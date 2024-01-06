@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/model/imsnsit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:imsnsit/screens/screens.dart';
 
 @RoutePage()
 class LoginScreen extends StatelessWidget {
@@ -57,7 +57,7 @@ class LoginScreen extends StatelessWidget {
         prefs.setString('username', username);
         prefs.setString('password', password);
 
-        Screens.goToAttandanceScreen(context);
+        context.go('/rooms');
       } else {
         showErrorDialog();
       }
