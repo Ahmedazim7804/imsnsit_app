@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
             future: context.read<ImsProvider>().ims.getInitialData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return const AttandanceScreen();
+                return const AuthenticationScreen();
               } else {
                 return const Center(child: CircularProgressIndicator());
               }

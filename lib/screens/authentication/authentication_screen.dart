@@ -3,7 +3,8 @@ import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/auto_relogin.dart';
 import 'package:imsnsit/model/imsnsit.dart';
-import 'package:imsnsit/screens/authentication/login_screen.dart'; 
+import 'package:imsnsit/screens/authentication/login_screen.dart';
+import 'package:imsnsit/screens/rooms_screen.dart'; 
 import 'package:provider/provider.dart';
 
 class AuthenticationScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class AuthenticationScreen extends StatelessWidget {
           bool isAuthenticated = snaphot.data!;
           
           if (isAuthenticated) {
-            return const AttandanceScreen();
+            return const RoomScreen();
           } else {
             if (ims.username != null && ims.password != null) {
               return const AutoRelogin ();
