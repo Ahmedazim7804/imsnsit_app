@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:html/dom.dart';
-import 'package:http_session/http_session.dart';
 import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 import 'package:imsnsit/model/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cookie_store/cookie_store.dart';
 
 import 'parseData.dart';
 
@@ -112,13 +112,7 @@ class Ims {
   }
 
   Future<void> authenticate(String cap, String username, String password) async {
-
-    if (await isUserAuthenticated()) {
-      isAuthenticated = true;
-      print("Already Loged in.....");
-      return;
-    }
-
+    
     baseHeaders.addAll(
       {
         'Referer': 'https://www.imsnsit.org/imsnsit/student_login.php',
@@ -141,7 +135,13 @@ class Ims {
         };
 
     var response = await session.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, data: data);
-    
+  
+    if (response.body.contains('Invalid security Number')) {
+      isAuthenticated = false;
+      print('MAYBE     CAPTCHA  WRONG');
+      return;
+    }
+
     referrer = response.request!.url.toString();
 
     final doc = parse(response.body);
@@ -199,7 +199,10 @@ class Ims {
 
     final response = await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
 
-    final profileData = ParseData.parseProfileData(response.body);
+    Map<String, String> profileData = ParseData.parseProfileData(response.body);
+    final profileImageUrl = baseUrl.resolve(profileData['profile_image']!).toString();
+    profileData['profileImage'] = profileImageUrl;
+    profileData['profileUrl'] = profileUrl!;
 
     return profileData;
   }
@@ -240,7 +243,7 @@ class Ims {
 
     Uri url = Uri.parse(allUrls['Attendance Report']!);
 
-    Response response = await session.get(url, headers: baseHeaders);
+    http.Response response = await session.get(url, headers: baseHeaders);
 
     final doc = parse(response.body);
 
@@ -258,7 +261,7 @@ class Ims {
     Map<String, String> data = {
             'year': '2023-24',
             'enc_year': encYear,
-            'sem': '1',
+            'sem': '2',
             'enc_sem': encSem,
             'submit': 'Submit',
             'recentitycode': rollNo!,
@@ -279,7 +282,7 @@ class Ims {
 
     Uri url = Uri.parse(allUrls['Attendance Report']!);
 
-    Response response = await session.get(url, headers: baseHeaders);
+    http.Response response = await session.get(url, headers: baseHeaders);
 
     final doc = parse(response.body);
 
@@ -297,7 +300,7 @@ class Ims {
     Map<String, String> data = {
             'year': '2023-24',
             'enc_year': encYear,
-            'sem': '1',
+            'sem': '2',
             'enc_sem': encSem,
             'submit': 'Submit',
             'recentitycode': rollNo!,

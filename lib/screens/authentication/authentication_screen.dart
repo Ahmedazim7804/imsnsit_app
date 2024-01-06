@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
-import 'package:imsnsit/screens/captcha_screen.dart';
-import 'package:imsnsit/screens/homescreen.dart';
+import 'package:imsnsit/screens/authentication/auto_relogin.dart';
 import 'package:imsnsit/model/imsnsit.dart';
-import 'package:imsnsit/screens/login_screen.dart';
+import 'package:imsnsit/screens/authentication/login_screen.dart'; 
 import 'package:provider/provider.dart';
 
 class AuthenticationScreen extends StatelessWidget {
@@ -27,14 +26,14 @@ class AuthenticationScreen extends StatelessWidget {
             return const AttandanceScreen();
           } else {
             if (ims.username != null && ims.password != null) {
-              return const CaptchaScreen();
+              return const AutoRelogin ();
             } else {
               return const LoginScreen();
             }
           }
 
         } else {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
 
       },

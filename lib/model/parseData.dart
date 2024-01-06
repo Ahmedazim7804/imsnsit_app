@@ -20,6 +20,12 @@ class ParseData {
         String value = tdTags[1].text;
 
         data[text] = value;
+      } else {
+        final image = tdTags[0].querySelectorAll('img');
+        if (image.isNotEmpty) {
+          final imagePath = image[0].attributes['src'];
+          data['profile_image'] = imagePath!;
+        }
       }
     }
 
@@ -108,8 +114,19 @@ class ParseData {
 
     final subjects = subjectTags.sublist(1).map((tag) => tag.text).toList();
 
-    Map<String, Map<String, String>> data = Map.fromEntries(subjects.map((subject) => MapEntry(subject, {'name': courses[subject]['subjectName']})));
+    Map<String, Map<String, String>> data = {};
+    print(courses);
+    for (String subject in subjects) {
+      String subjectName;
 
+      if (courses.containsKey(subject)) {
+        subjectName = courses[subject]['subjectName'];
+      } else {
+        subjectName = 'unknown';
+      }
+
+      data[subject] = {'name': subjectName};
+    } 
     final allRows = doc.querySelectorAll('html body div#myreport table.plum_fieldbig tbody tr.plum_head');
     final requiredRows = allRows.sublist(allRows.length-4);
 
@@ -128,6 +145,7 @@ class ParseData {
       }
     }
     
+    print(data);
 
     return data;
 

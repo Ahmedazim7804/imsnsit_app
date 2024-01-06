@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'package:cookie_store/cookie_store.dart';
-import 'package:http_session/http_session.dart';
 
 class Session {
   final client = http.Client();
@@ -11,14 +10,14 @@ class Session {
   Session({this.maxRedirects = 15});
 
 
-  Future<Response> get(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}}) async {
+  Future<http.Response> get(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}}) async {
     if (--redirectsLeft < 0) {
       throw Exception('Too many Redirects');
     }
 
     headers['Cookie'] = getCookies(url);
     
-    final response = await http.get(url, headers: headers);
+    http.Response response = await http.get(url, headers: headers);
 
     updateCookies(response.headers, url);
 
@@ -35,7 +34,7 @@ class Session {
     return response;
   }
 
-  Future<Response> post(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}, Map<String, String> data = const{}}) async {
+  Future<http.Response> post(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}, Map<String, String> data = const{}}) async {
     if (--redirectsLeft < 0) {
       throw Exception('Too many Redirects');
     }
