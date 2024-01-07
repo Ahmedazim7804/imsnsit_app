@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,10 @@ class ProfileScreen extends StatelessWidget {
           title: const Text("Profile"),
           centerTitle: true,
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.logout, color: Theme.of(context).textTheme.bodyLarge!.color,))
+            IconButton(onPressed: () {
+              context.read<ImsProvider>().ims.logout();
+              context.pushReplacement('/authentication/login_screen');
+            }, icon: Icon(Icons.logout, color: Theme.of(context).textTheme.bodyLarge!.color,))
           ],
         ),
         body: FutureBuilder(
