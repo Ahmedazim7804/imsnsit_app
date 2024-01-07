@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imsnsit/model/functions.dart';
@@ -7,7 +6,6 @@ import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
-@RoutePage()
 class AutoRelogin extends StatelessWidget {
   const AutoRelogin({super.key});
 
