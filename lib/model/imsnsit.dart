@@ -302,7 +302,7 @@ class Ims {
 
     }
     
-    
+
     Map<String, dynamic> courses = await getEnrolledCourses();
 
     Map<String, String> data = {
