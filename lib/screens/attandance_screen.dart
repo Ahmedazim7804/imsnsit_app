@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
@@ -44,7 +43,6 @@ class SubjectAttandance {
     }
 }
 
-@RoutePage()
 class AttandanceScreen extends StatelessWidget {
   const AttandanceScreen({super.key});
 
