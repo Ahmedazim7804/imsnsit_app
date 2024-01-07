@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imsnsit/root_scaffold.dart';
 import 'package:imsnsit/myapp.dart';
+import 'package:imsnsit/screens/about_screen.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/authentication_screen.dart';
 import 'package:imsnsit/screens/authentication/auto_relogin.dart';
@@ -77,6 +78,10 @@ class MyAppRouter {
       GoRoute(
         path: '/authentication/manual_login',
         pageBuilder: (context, state) => const MaterialPage(child: ManualRelogin()),
+      ),
+      GoRoute(
+        path: '/about_screen',
+        pageBuilder: (context, state) => const MaterialPage(child: AboutScreen()),
       ),
     ]
   );

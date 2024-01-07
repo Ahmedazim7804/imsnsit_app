@@ -15,6 +15,10 @@ class ProfileScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Profile"),
           centerTitle: true,
+          leading: IconButton(
+            onPressed: () => context.go('/about_screen'),
+            icon: const Icon(Icons.info),
+            color: Theme.of(context).textTheme.bodyLarge!.color),
           actions: [
             IconButton(onPressed: () {
               context.read<ImsProvider>().ims.logout();
