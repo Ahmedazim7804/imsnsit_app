@@ -10,38 +10,47 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      return FutureBuilder(
-        future: context.read<ImsProvider>().ims.getProfileData(), 
-        builder: ((context, snapshot) {
-          if (snapshot.hasData) {
-            
-            Map<String, String> data = snapshot.data!;
-      
-            return Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ProfileImage(imageUrl: data['profileImage']!, referrer: data['profileUrl']!),
-              InfoCard(keys: 'Roll No.', value: data['Student ID']!,),
-              InfoCard(keys: 'Name', value: data['Student Name']!,),
-              InfoCard(keys: 'DOB', value: data['DOB']!,),
-              InfoCard(keys: 'Gender', value: data['Gender']!,),
-              InfoCard(keys: 'Admission', value: data['Admission']!,),
-              InfoCard(keys: 'Catergoy', value: data['Category']!,),
-              InfoCard(keys: 'Branch', value: data['Branch Name']!.replaceAll(' ', '\n'),),
-              InfoCard(keys: 'Degree', value: data['Degree']!,),
-              InfoCard(keys: 'Section', value: data['Section']!,)
-            ],
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Profile"),
+          centerTitle: true,
+          actions: [
+            IconButton(onPressed: () {}, icon: Icon(Icons.logout, color: Theme.of(context).textTheme.bodyLarge!.color,))
+          ],
+        ),
+        body: FutureBuilder(
+          future: context.read<ImsProvider>().ims.getProfileData(), 
+          builder: ((context, snapshot) {
+            if (snapshot.hasData) {
+              
+              Map<String, String> data = snapshot.data!;
+        
+              return Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ProfileImage(imageUrl: data['profileImage']!, referrer: data['profileUrl']!),
+                InfoCard(keys: 'Roll No.', value: data['Student ID']!,),
+                InfoCard(keys: 'Name', value: data['Student Name']!,),
+                InfoCard(keys: 'DOB', value: data['DOB']!,),
+                InfoCard(keys: 'Gender', value: data['Gender']!,),
+                InfoCard(keys: 'Admission', value: data['Admission']!,),
+                InfoCard(keys: 'Catergoy', value: data['Category']!,),
+                InfoCard(keys: 'Branch', value: data['Branch Name']!.replaceAll(' ', '\n'),),
+                InfoCard(keys: 'Degree', value: data['Degree']!,),
+                InfoCard(keys: 'Section', value: data['Section']!,)
+              ],
+            ),
+          )
+          );
+        
+            } else {
+              return const CircularProgressIndicator();
+            }
+          })
           ),
-        )
-        );
-      
-          } else {
-            return const CircularProgressIndicator();
-          }
-        })
-        );
+      );
   }
 }
 
