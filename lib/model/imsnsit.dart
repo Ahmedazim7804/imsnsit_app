@@ -35,6 +35,7 @@ class Ims {
   final Session session = Session();
   bool isAuthenticated = false;
   String? hrandNum;
+  String? semester;
    
   
   Future<void> getSessionAttributes() async {
@@ -140,7 +141,7 @@ class Ims {
   
     if (response.body.contains('Invalid security Number')) {
       isAuthenticated = false;
-      print('MAYBE     CAPTCHA  WRONG');
+      print('MAYBE WRONG CAPTCHA');
       return;
     }
 
@@ -236,6 +237,9 @@ class Ims {
     final response = await session.get(url, headers: baseHeaders);
     
     Map<String, dynamic> enrolledCourses = ParseData.parseEnrolledCoursesData(response.body);
+    String sem = ParseData.parseSemester(response.body);
+    
+    semester = sem;
 
     return enrolledCourses;
 
@@ -263,7 +267,7 @@ class Ims {
     Map<String, String> data = {
             'year': '2023-24',
             'enc_year': encYear,
-            'sem': '2',
+            'sem': semester!,
             'enc_sem': encSem,
             'submit': 'Submit',
             'recentitycode': rollNo!,
@@ -297,11 +301,14 @@ class Ims {
       degree = doc.querySelector("[name=degree]")!.attributes['value'];
 
     }
+    
+    
+    Map<String, dynamic> courses = await getEnrolledCourses();
 
     Map<String, String> data = {
             'year': '2023-24',
             'enc_year': encYear,
-            'sem': '2',
+            'sem': semester!,
             'enc_sem': encSem,
             'submit': 'Submit',
             'recentitycode': rollNo!,
@@ -310,9 +317,8 @@ class Ims {
             'ename': '',
             'ecode': '',
     };
-    
+
     response = await session.post(url, headers: baseHeaders, data: data);
-    Map<String, dynamic> courses = await getEnrolledCourses();
     
     final attandanceData = ParseData.parseAttandanceData(response.body, courses);
 

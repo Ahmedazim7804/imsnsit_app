@@ -68,6 +68,17 @@ class ParseData {
 
   }
 
+  static String parseSemester(String htmlContent) {
+
+    final doc = parse(htmlContent);
+
+    final divTag = doc.querySelector('html body div#div2.plum_head');
+    String semsester = divTag!.firstChild!.text!.split('Semester ')[1];
+
+    return semsester;
+
+  }
+
   static Map<String, Map<String, String>> parseAbsoluteAttandanceData(String htmlContent) {
 
     final doc = parse(htmlContent);
