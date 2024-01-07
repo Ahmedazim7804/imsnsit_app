@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'dart:io';
@@ -10,36 +11,42 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<ImsProvider>().ims.getProfileData(), 
-      builder: ((context, snapshot) {
-        if (snapshot.hasData) {
-          
-          Map<String, String> data = snapshot.data!;
-
-          return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ProfileImage(imageUrl: data['profileImage']!, referrer: data['profileUrl']!),
-          InfoCard(keys: 'Roll No.', value: data['Student ID']!,),
-          InfoCard(keys: 'Name', value: data['Student Name']!,),
-          InfoCard(keys: 'DOB', value: data['DOB']!,),
-          InfoCard(keys: 'Gender', value: data['Gender']!,),
-          InfoCard(keys: 'Admission', value: data['Admission']!,),
-          InfoCard(keys: 'Catergoy', value: data['Category']!,),
-          InfoCard(keys: 'Branch', value: data['Branch Name']!.replaceAll(' ', '\n'),),
-          InfoCard(keys: 'Degree', value: data['Degree']!,),
-          InfoCard(keys: 'Section', value: data['Section']!,)
-        ],
-      )
-      );
-
-        } else {
-          return const CircularProgressIndicator();
-        }
-      })
-      );
+    return Scaffold(
+      appBar: AppBar(),
+      bottomNavigationBar: const MyBottomNavigationBar(),
+      body: FutureBuilder(
+        future: context.read<ImsProvider>().ims.getProfileData(), 
+        builder: ((context, snapshot) {
+          if (snapshot.hasData) {
+            
+            Map<String, String> data = snapshot.data!;
+      
+            return Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ProfileImage(imageUrl: data['profileImage']!, referrer: data['profileUrl']!),
+              InfoCard(keys: 'Roll No.', value: data['Student ID']!,),
+              InfoCard(keys: 'Name', value: data['Student Name']!,),
+              InfoCard(keys: 'DOB', value: data['DOB']!,),
+              InfoCard(keys: 'Gender', value: data['Gender']!,),
+              InfoCard(keys: 'Admission', value: data['Admission']!,),
+              InfoCard(keys: 'Catergoy', value: data['Category']!,),
+              InfoCard(keys: 'Branch', value: data['Branch Name']!.replaceAll(' ', '\n'),),
+              InfoCard(keys: 'Degree', value: data['Degree']!,),
+              InfoCard(keys: 'Section', value: data['Section']!,)
+            ],
+          ),
+        )
+        );
+      
+          } else {
+            return const CircularProgressIndicator();
+          }
+        })
+        ),
+    );
   }
 }
 
