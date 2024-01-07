@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 
 class SubjectAttandance {
@@ -49,25 +50,29 @@ class AttandanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return FutureBuilder(
-    future: Provider.of<ImsProvider>(context).ims.getAttandanceData(), 
-    builder: (context, snapshot) {
-      if (snapshot.hasData) {
-        print('sdsdsdsd');
-        List<SubjectAttandance> subjectAttandance = snapshot.data!.entries.map((entry) => SubjectAttandance(entry: entry)).toList();
-
-        return Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: subjectAttandance.map((item) => AttandanceCard(data: item,)).toList(),
+    return Scaffold(
+      appBar: AppBar(),
+      bottomNavigationBar: const MyBottomNavigationBar(),
+      body: FutureBuilder(
+      future: Provider.of<ImsProvider>(context).ims.getAttandanceData(), 
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          
+          List<SubjectAttandance> subjectAttandance = snapshot.data!.entries.map((entry) => SubjectAttandance(entry: entry)).toList();
+      
+          return Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: subjectAttandance.map((item) => AttandanceCard(data: item,)).toList(),
+              ),
             ),
-          ),
-        );
-      } else {
-        return const Center(child: CircularProgressIndicator());
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
       }
-    }
+      ),
     );
   }
 }
