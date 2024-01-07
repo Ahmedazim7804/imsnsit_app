@@ -38,7 +38,7 @@ dependencies:
   cookie_store: ^0.3.5
   html:
   provider: ^6.1.1
-  cached_network_image: ^3.3.0
+  cached_network_image: ^3.3.1
   shared_preferences: ^2.2.2
   google_fonts: ^6.1.0
   flutter_tesseract_ocr: ^0.4.24

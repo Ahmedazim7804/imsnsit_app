@@ -6,7 +6,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   Future<void> goToGithubPage() async {
-    final Uri url = Uri.parse('https://github.com/ahmedazim7804/');
+    final Uri url = Uri.parse('https://github.com/ahmedazim7804/imsnsit_app');
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }
