@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:imsnsit/model/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cookie_store/cookie_store.dart';
+import 'package:imsnsit/model/room.dart';
 
 import 'parseData.dart';
 
@@ -319,19 +320,19 @@ class Ims {
   }
 
   Future<void> roomsList({required StreamController streamController}) async {
-    Map<String, Map<String, List<String>>> ww = {};
-    List<String> rooms = [
+    List<Room> rooms = [];
+    List<String> roomsName = [
       'APJ-01',
-      // 'APJ-02',
-      // 'APJ-03',
-      // 'APJ-04',
-      // 'APJ-05',
-      // 'APJ-06',
-      // 'APJ-07',
-      // 'APJ-08',
-      // 'APJ-09',
-      // 'APJ-10',
-      // 'APJ-11',
+      'APJ-02',
+      'APJ-03',
+      'APJ-04',
+      'APJ-05',
+      'APJ-06',
+      'APJ-07',
+      'APJ-08',
+      'APJ-09',
+      'APJ-10',
+      'APJ-11',
     ];
 
     final headers = {
@@ -353,11 +354,11 @@ class Ims {
 
     final url = Uri.parse('https://www.imsnsit.org/imsnsit/plum_url.php?Xa9HvscdKyH6kL9nKIyCD80Af4YmbpJSlN4qzyQsnhEW752gaaBRKjC5B+5SgxUWzRm0BuyJ0EuNJ8BxklMF6Vjet5gq8CLaWdFN9qBzeu0pGzfeTxg0MznYdBq2W4O3sKNiJJKtD7BpHz30vozHgOKP0ezxpMWh2PtNzR3g6yU');
 
-    for (String room in rooms) {
+    for (String roomName in roomsName) {
 
       final data = {
-        'roomcode': room,
-        'room': room,
+        'roomcode': roomName,
+        'room': roomName,
         'semcmb': '2-4-6-8',
         'enc_semcmb': 'P0RYCVYHDvjv4ZWnV+lsiPiOE6wbkYUVXnt1gj7ut/9uyy0d8ZkKWDvCKeeG1r0F',
         'submit': 'Go',
@@ -365,9 +366,18 @@ class Ims {
 
       final res = await session.post(url, headers: headers, data: data);
       Map<String, List<String>> roomData = ParseData.parseRoomData(res.body);
+      
+      Room room = Room(
+        name: roomName,
+        mon: roomData['Mon'] ?? [],
+        tue: roomData['Tue'] ?? [],
+        wed: roomData['Wed'] ?? [],
+        thu: roomData['Thu'] ?? [],
+        fri: roomData['Fri'] ?? [],
+      );
 
-      ww[room] = roomData;
-      streamController.sink.add(ww);
+      rooms.add(room);
+      streamController.sink.add(rooms);
 
     }
   }
