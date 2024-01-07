@@ -33,51 +33,55 @@ class MyAppRouter {
           StatefulShellBranch(
             navigatorKey: _shellNavigatorAuthenticationKey,
             routes: [
-          GoRoute(
-            path: '/',
-            pageBuilder: (context, state) => const MaterialPage(child: MyApp()),
+              GoRoute(
+                path: '/',
+                pageBuilder: (context, state) => const MaterialPage(child: MyApp()),
+              ),
+              GoRoute(
+                path: '/authentication/authentication_screen',
+                pageBuilder: (context, state) => const MaterialPage(child: AuthenticationScreen()),
+              ),
+              GoRoute(
+                path: '/authentication/login_screen',
+                pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
+              ),
+              GoRoute(
+                path: '/authentication/auto_login',
+                pageBuilder: (context, state) => const MaterialPage(child: AutoRelogin()),
+              ),
+              GoRoute(
+                path: '/authentication/manual_login',
+                pageBuilder: (context, state) => const MaterialPage(child: ManualRelogin()),
+              ),
+            ]
           ),
-          GoRoute(
-            path: '/authentication/authentication_screen',
-            pageBuilder: (context, state) => const MaterialPage(child: AuthenticationScreen()),
-          ),
-          GoRoute(
-            path: '/authentication/login_screen',
-            pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
-          ),
-          GoRoute(
-            path: '/authentication/auto_login',
-            pageBuilder: (context, state) => const MaterialPage(child: AutoRelogin()),
-          ),
-          GoRoute(
-            path: '/authentication/manual_login',
-            pageBuilder: (context, state) => const MaterialPage(child: ManualRelogin()),
-          ),
-          ]),
           StatefulShellBranch(
             navigatorKey: _shellNavigatorAttendanceKey,
             routes: [
-          GoRoute(
-            path: '/attandance',
-            pageBuilder: (context, state) => const MaterialPage(child: AttandanceScreen()),
+              GoRoute(
+                path: '/attandance',
+                pageBuilder: (context, state) => const MaterialPage(child: AttandanceScreen()),
+              ),
+            ]
           ),
-          ]),
           StatefulShellBranch(
             navigatorKey: _shellNavigatorRoomsKey,
             routes: [
-            GoRoute(
-            path: '/rooms',
-            pageBuilder: (context, state) => const MaterialPage(child: RoomScreen()),
+              GoRoute(
+                path: '/rooms',
+                pageBuilder: (context, state) => const MaterialPage(child: RoomScreen()),
+              ),
+            ]
           ),
-          ]),
           StatefulShellBranch(
             navigatorKey: _shellNavigatorProfileKey,
             routes: [
-            GoRoute(
-            path: '/profile_screen',
-            pageBuilder: (context, state) => const MaterialPage(child: ProfileScreen()),
-          ),
-          ])
+              GoRoute(
+                path: '/profile_screen',
+                pageBuilder: (context, state) => const MaterialPage(child: ProfileScreen()),
+              ),
+            ]
+          )
         ]
       ),
     ]
