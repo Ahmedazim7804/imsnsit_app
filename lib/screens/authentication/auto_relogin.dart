@@ -10,7 +10,6 @@ class AutoRelogin extends StatelessWidget {
   const AutoRelogin({super.key});
 
   Future<bool> tryAutoLogin(Ims ims) async {
-
     String imageUrl = await ims.getCaptcha();
     String imagePath = await Functions.downloadFile(imageUrl);
 

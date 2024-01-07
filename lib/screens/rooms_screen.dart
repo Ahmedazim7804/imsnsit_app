@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/model/room.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:imsnsit/widgets/bottom_navigation_bar.dart';
 
 class RoomScreen extends StatelessWidget {
   const RoomScreen({super.key});
@@ -12,19 +11,17 @@ class RoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final streamController = StreamController<List<Room>>();
-    //context.read<ImsProvider>().ims.roomsList(streamController: streamController);
-    return Scaffold(
-      bottomNavigationBar: const MyBottomNavigationBar(),
-      appBar: AppBar(
-        title: const Text("Unscheduled APJ Rooms"),
-        centerTitle: true,
-        actions: [
-          IconButton(onPressed: () {
-            context.read<ImsProvider>().ims.roomsList(streamController: streamController);
-          }, icon: Icon(Icons.refresh, color: Theme.of(context).textTheme.bodyLarge!.color,))
-        ],
-      ),
-      body: StreamBuilder(stream: streamController.stream, initialData: const [Room(name: "APJ-01", mon: ['03:00-04:00', '04:00-05:00'], tue: [], wed: [], thu: [], fri: [])],builder: ((context, AsyncSnapshot<List<Room>> snapshot) {
+    context.read<ImsProvider>().ims.roomsList(streamController: streamController);
+      // appBar: AppBar(
+      //   title: const Text("Unscheduled APJ Rooms"),
+      //   centerTitle: true,
+      //   actions: [
+      //     IconButton(onPressed: () {
+      //       context.read<ImsProvider>().ims.roomsList(streamController: streamController);
+      //     }, icon: Icon(Icons.refresh, color: Theme.of(context).textTheme.bodyLarge!.color,))
+      //   ],
+      // ),
+      return StreamBuilder(stream: streamController.stream, initialData: const [Room(name: "APJ-01", mon: ['03:00-04:00', '04:00-05:00'], tue: [], wed: [], thu: [], fri: [])],builder: ((context, AsyncSnapshot<List<Room>> snapshot) {
       
         if (snapshot.hasData) {
           return GridView.builder(itemCount: snapshot.data!.length, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2), itemBuilder: (_, index) {
@@ -34,8 +31,7 @@ class RoomScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         }
-      )),
-    );
+      ));
   }
 }
 
