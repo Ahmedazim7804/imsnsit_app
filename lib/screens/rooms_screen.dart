@@ -11,7 +11,7 @@ class RoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final streamController = StreamController<List<Room>>();
-    // context.read<ImsProvider>().ims.roomsList(streamController: streamController);
+    context.read<ImsProvider>().ims.roomsList(streamController: streamController);
       return Scaffold(
         appBar: AppBar(
           title: const Text("Unscheduled APJ Rooms"),

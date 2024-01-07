@@ -280,7 +280,6 @@ class Ims {
     response = await session.post(url, headers: baseHeaders, data: data);
     
     final attandanceData = ParseData.parseAbsoluteAttandanceData(response.body);
-
     return attandanceData;
   }
 

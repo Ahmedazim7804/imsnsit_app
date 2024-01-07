@@ -106,7 +106,10 @@ class ParseData {
             String subject = pair[1]!;
             String attandance = pair[0]!;
 
-            data[subject]![day] = attandance;
+            if (attandance.isNotEmpty) {
+              data[subject]![day] = attandance;
+            }
+
           }
 
         }
