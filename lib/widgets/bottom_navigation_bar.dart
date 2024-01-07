@@ -53,7 +53,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month,),
-              label: 'attendance'
+              label: 'Attendance'
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.laptop),

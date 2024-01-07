@@ -25,6 +25,6 @@ class AuthenticationScreen extends StatelessWidget {
       
     });
 
-    return const CircularProgressIndicator();
+    return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor));
   }
 }

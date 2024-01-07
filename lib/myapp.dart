@@ -9,8 +9,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<ImsProvider>().ims.getInitialData().then((data) => context.go('/authentication/authentication_screen'));
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator(),)
-    );
+    return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColor,));
   }
 }
