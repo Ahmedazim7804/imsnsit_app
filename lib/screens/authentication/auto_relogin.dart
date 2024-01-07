@@ -38,6 +38,6 @@ class AutoRelogin extends StatelessWidget {
       }
     });
 
-    return const Center(child: CircularProgressIndicator());
+    return Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onBackground,));
   }
 }
