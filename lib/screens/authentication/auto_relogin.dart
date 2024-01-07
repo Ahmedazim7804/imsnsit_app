@@ -14,7 +14,7 @@ class AutoRelogin extends StatelessWidget {
     String imagePath = await Functions.downloadFile(imageUrl);
 
     String captchaText = await Functions.performOcr(imagePath);
-    
+  
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username')!;
     String password = prefs.getString('password')!;

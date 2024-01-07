@@ -11,7 +11,6 @@ import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorAuthenticationKey = GlobalKey<NavigatorState>(debugLabel: 'shellAuthentication');
 final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
 final _shellNavigatorAttendanceKey = GlobalKey<NavigatorState>(debugLabel: 'shellAttendance');
 final _shellNavigatorRoomsKey = GlobalKey<NavigatorState>(debugLabel: 'shellRooms');
@@ -30,31 +29,6 @@ class MyAppRouter {
           return AppScaffold(child: child,);
         },
         branches: [
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorAuthenticationKey,
-            routes: [
-              GoRoute(
-                path: '/',
-                pageBuilder: (context, state) => const MaterialPage(child: MyApp()),
-              ),
-              GoRoute(
-                path: '/authentication/authentication_screen',
-                pageBuilder: (context, state) => const MaterialPage(child: AuthenticationScreen()),
-              ),
-              GoRoute(
-                path: '/authentication/login_screen',
-                pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
-              ),
-              GoRoute(
-                path: '/authentication/auto_login',
-                pageBuilder: (context, state) => const MaterialPage(child: AutoRelogin()),
-              ),
-              GoRoute(
-                path: '/authentication/manual_login',
-                pageBuilder: (context, state) => const MaterialPage(child: ManualRelogin()),
-              ),
-            ]
-          ),
           StatefulShellBranch(
             navigatorKey: _shellNavigatorAttendanceKey,
             routes: [
@@ -83,6 +57,26 @@ class MyAppRouter {
             ]
           )
         ]
+      ),
+      GoRoute(
+        path: '/authentication/login_screen',
+        pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
+      ),
+      GoRoute(
+        path: '/',
+        pageBuilder: (context, state) => const MaterialPage(child: MyApp()),
+      ),
+      GoRoute(
+        path: '/authentication/authentication_screen',
+        pageBuilder: (context, state) => const MaterialPage(child: AuthenticationScreen()),
+      ),
+      GoRoute(
+        path: '/authentication/auto_login',
+        pageBuilder: (context, state) => const MaterialPage(child: AutoRelogin()),
+      ),
+      GoRoute(
+        path: '/authentication/manual_login',
+        pageBuilder: (context, state) => const MaterialPage(child: ManualRelogin()),
       ),
     ]
   );

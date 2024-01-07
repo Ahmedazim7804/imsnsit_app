@@ -382,6 +382,25 @@ class Ims {
     }
   }
 
+  void logout() async {
+    session.cookies.cookies = [];
+    username = '';
+    password = '';
+    profileUrl = '';
+    myActivitiesUrl = '';
+    allUrls = {};
+    isAuthenticated = false;
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('cookies');
+    prefs.remove('profileUrl');
+    prefs.remove('myActivitiesUrl');
+    prefs.remove('referrer');
+    prefs.remove('allUrls');
+    prefs.remove('username');
+    prefs.remove('password');
+
+  }
 }
 
 void main() {
