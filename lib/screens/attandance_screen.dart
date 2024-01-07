@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
-import 'package:imsnsit/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 
 class SubjectAttandance {
@@ -50,10 +49,7 @@ class AttandanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(),
-      bottomNavigationBar: const MyBottomNavigationBar(),
-      body: FutureBuilder(
+    return FutureBuilder(
       future: Provider.of<ImsProvider>(context).ims.getAttandanceData(), 
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -72,8 +68,7 @@ class AttandanceScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
       }
-      ),
-    );
+      );
   }
 }
 

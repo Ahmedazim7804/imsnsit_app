@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
-import 'package:imsnsit/widgets/bottom_navigation_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'dart:io';
@@ -11,10 +10,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      bottomNavigationBar: const MyBottomNavigationBar(),
-      body: FutureBuilder(
+      return FutureBuilder(
         future: context.read<ImsProvider>().ims.getProfileData(), 
         builder: ((context, snapshot) {
           if (snapshot.hasData) {
@@ -45,8 +41,7 @@ class ProfileScreen extends StatelessWidget {
             return const CircularProgressIndicator();
           }
         })
-        ),
-    );
+        );
   }
 }
 
