@@ -389,8 +389,8 @@ class Ims {
 
   void logout() async {
     session.cookies.cookies = [];
-    username = '';
-    password = '';
+    username = null;
+    password = null;
     profileUrl = '';
     myActivitiesUrl = '';
     allUrls = {};
