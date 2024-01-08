@@ -28,19 +28,18 @@ class SubjectAttandanceScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 600,
-                    height: 100,
-                    child: Card(
+                  Card(
                       color: Theme.of(context).colorScheme.secondary,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(subject, style: Theme.of(context).textTheme.headlineLarge,),
-                          Text(subjectCode, style: Theme.of(context).textTheme.headlineSmall,),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(subject, style: GoogleFonts.lexend(fontSize: 16),),
+                            Text(subjectCode, style: GoogleFonts.lexend(fontSize: 14)),
+                          ],
+                        ),
                       ),
-                    ),
                   ),
                   GridView.builder(
                     shrinkWrap: true,
