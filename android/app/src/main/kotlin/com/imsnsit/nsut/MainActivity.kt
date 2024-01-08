@@ -1,4 +1,4 @@
-package com.example.imsnsit
+package com.imsnsit.nsut
 
 import io.flutter.embedding.android.FlutterActivity
 
