@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/release
 
 /lib/data.json
+
+
+android/app/build.gradle
+/android/app/build.gradle
