@@ -32,7 +32,7 @@ class AutoRelogin extends StatelessWidget {
 
     tryAutoLogin(ims).then((loggedIn) {
       if (loggedIn) {
-        context.go('/rooms');
+        context.go('/attandance');
       } else {
         context.go('/authentication/manual_login');
       }
