@@ -10,6 +10,12 @@ import 'package:imsnsit/model/room.dart';
 
 import 'parseData.dart';
 
+enum LoginProperties {
+  wrongCaptcha,
+  wrongPassword,
+  loginedSuccesfully
+}
+
 class Ims {
 
   String? username;
@@ -114,7 +120,7 @@ class Ims {
     
   }
 
-  Future<void> authenticate(String cap, String username, String password) async {
+  Future<LoginProperties> authenticate(String cap, String username, String password) async {
     
     baseHeaders.addAll(
       {
@@ -138,16 +144,28 @@ class Ims {
         };
 
     var response = await session.post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'), headers: baseHeaders, data: data);
-  
-    if (response.body.contains('Invalid security Number')) {
-      isAuthenticated = false;
-      print('MAYBE WRONG CAPTCHA');
-      return;
+
+    final doc = parse(response.body);
+
+    final loginResults = doc.querySelectorAll("html body form table tbody tr td.plum_field font");
+
+    if (loginResults.length >= 2) {
+      final loginResult = loginResults[2].text;
+      if (loginResult.contains('Invalid Security Number')) {
+
+        isAuthenticated = false;
+        return LoginProperties.wrongCaptcha;
+
+      } else if (loginResult.contains('Invalid password')) {
+
+        isAuthenticated = false;
+        return LoginProperties.wrongPassword;
+
+      }
     }
 
     referrer = response.request!.url.toString();
 
-    final doc = parse(response.body);
     final List links = doc.getElementsByTagName('a');
     for (Element link in links) {
       if (link.text == 'Profile') {
@@ -171,6 +189,7 @@ class Ims {
 
     isAuthenticated = true;
 
+    return LoginProperties.loginedSuccesfully;
   }
 
   Future<String> getCaptcha() async {
