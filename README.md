@@ -1,16 +1,24 @@
-# imsnsit
+# Nsut Ims
+This app provide access to attandance, profile and other data to NSUT students through ims in an easy to use interface.
 
-A new Flutter project.
+# Features
+- Login and subsequent logins work without captcha (almost*).
+- Attandance Screen
+- Shows times when APJ room is unscheduled for class on any day.
+- Profile Screen
 
-## Getting Started
+<sub>*: sometime rarely the captcha might not autofill, it will prompt you to solve it manually.
 
-This project is a starting point for a Flutter application.
+# Screenshots
+<p float="left">
+  <img src="screenshots/Screenshot 1.jpg" alt="Screenshot Gallery" width="160"/>
+  <img src="screenshots/Screenshot 2.jpg" alt="Screenshot Gallery" width="160"/>
+  <img src="screenshots/Screenshot 3.jpg" alt="Screenshot Gallery" width="160"/>
+</p>
+<p float="left">
+  <img src="screenshots/Screenshot 4.jpg" alt="Screenshot Gallery" width="160"/>
+  <img src="screenshots/Screenshot 5.jpg" alt="Screenshot Gallery" width="160"/>
+</p>
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Permissions
+- Only internet permission is required.
