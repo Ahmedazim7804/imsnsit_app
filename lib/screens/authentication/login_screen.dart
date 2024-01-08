@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/model/imsnsit.dart';
@@ -38,6 +39,8 @@ class LoginScreen extends StatelessWidget {
     }
 
     void onSubmit(Ims ims) async {
+
+      context.loaderOverlay.show();
       
       String imageUrl = await ims.getCaptcha();
       String imagePath = await Functions.downloadFile(imageUrl);
@@ -49,6 +52,8 @@ class LoginScreen extends StatelessWidget {
       
       await ims.authenticate(captchaText, username, password);
       
+      context.loaderOverlay.hide();
+
       if (ims.isAuthenticated) {
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -62,62 +67,64 @@ class LoginScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Welcome to", style: GoogleFonts.lexend(fontSize: 36, fontWeight: FontWeight.bold),),
-            Image.asset('assets/nsut.png', width: 100, height: 100,),
-            const SizedBox(height: 25,),
-            Text('Enter your credentials to log in your account', style: GoogleFonts.lexend(fontSize: 15),),
-            const SizedBox(height: 25,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: TextField(
-                controller: usernameController,
-                cursorColor: Theme.of(context).colorScheme.onBackground,
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  labelStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.primary.withAlpha(150),
-                  isDense: true,
-                  prefixIcon: const Icon(Icons.person_rounded),
-                  hintText: "Enter your username",
-                  hintStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20))
-                  )
-                ),),
-            ),
-            Padding(  
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: TextField(
-                cursorColor: Theme.of(context).colorScheme.onBackground,
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.primary.withAlpha(150),
-                  isDense: true,
-                  prefixIcon: const Icon(Icons.lock_rounded),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20))
-                  )
-                ),),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                onSubmit(ims);
-              }, 
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.onBackground,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))
-                ),
-              child: Text("Submit", style: GoogleFonts.lexend(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),),)
-          ],
+      body: LoaderOverlay(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Welcome to", style: GoogleFonts.lexend(fontSize: 36, fontWeight: FontWeight.bold),),
+              Image.asset('assets/nsut.png', width: 100, height: 100,),
+              const SizedBox(height: 25,),
+              Text('Enter your credentials to log in your account', style: GoogleFonts.lexend(fontSize: 15),),
+              const SizedBox(height: 25,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: TextField(
+                  controller: usernameController,
+                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  decoration: InputDecoration(
+                    labelText: 'Username',
+                    labelStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(150),
+                    isDense: true,
+                    prefixIcon: const Icon(Icons.person_rounded),
+                    hintText: "Enter your username",
+                    hintStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20))
+                    )
+                  ),),
+              ),
+              Padding(  
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: TextField(
+                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(150),
+                    isDense: true,
+                    prefixIcon: const Icon(Icons.lock_rounded),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20))
+                    )
+                  ),),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  onSubmit(ims);
+                }, 
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.onBackground,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))
+                  ),
+                child: Text("Submit", style: GoogleFonts.lexend(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),),)
+            ],
+          ),
         ),
       ),
     );
