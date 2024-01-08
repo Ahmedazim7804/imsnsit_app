@@ -19,8 +19,7 @@ class LoginScreen extends StatelessWidget {
       title: Text('An error has occured', style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),),
       content: Text('Username or password is incorrect. Try Again', style: GoogleFonts.roboto(),),
       actions: [
-        TextButton(onPressed: () {}, child: const Text('Try Captcha', style: TextStyle(color: Colors.white),)),
-        TextButton(onPressed: () {}, child: const Text("Ok", style: TextStyle(color: Colors.white),)),
+        TextButton(onPressed: () => context.pop(), child: const Text("Ok", style: TextStyle(color: Colors.white),)),        
       ],
     );
   } 
@@ -50,7 +49,7 @@ class LoginScreen extends StatelessWidget {
       String username = usernameController.text;
       String password = passwordController.text;
       
-      await ims.authenticate(captchaText, username, password);
+      final authenticationStatus = await ims.authenticate(captchaText, username, password);
       
       context.loaderOverlay.hide();
 
@@ -61,8 +60,12 @@ class LoginScreen extends StatelessWidget {
         prefs.setString('password', password);
 
         context.go('/attandance');
+        
       } else {
-        showErrorDialog();
+        
+        if (authenticationStatus == LoginProperties.wrongPassword) {
+          showErrorDialog();
+        }
       }
     }
 
