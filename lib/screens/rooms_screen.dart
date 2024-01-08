@@ -22,7 +22,7 @@ class RoomScreen extends StatelessWidget {
             }, icon: Icon(Icons.refresh, color: Theme.of(context).textTheme.bodyLarge!.color,))
           ],
         ),
-        body: StreamBuilder(stream: streamController.stream, initialData: const [Room(name: "APJ-01", mon: ['03:00-04:00', '04:00-05:00'], tue: [], wed: [], thu: [], fri: [])],builder: ((context, AsyncSnapshot<List<Room>> snapshot) {
+        body: StreamBuilder(stream: streamController.stream, builder: ((context, AsyncSnapshot<List<Room>> snapshot) {
         
           if (snapshot.hasData) {
             return GridView.builder(itemCount: snapshot.data!.length, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2), itemBuilder: (_, index) {

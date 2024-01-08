@@ -9,11 +9,6 @@ class SubjectAttandanceScreen extends StatelessWidget {
   final String subjectCode;
   final String subject;
 
-
-  Future<Map<String, dynamic>> onPress() async {
-    return {"Jan-02": 1, "Jan-03": 1, "Jan-04": 0, "Jan-05": "GH"};
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
