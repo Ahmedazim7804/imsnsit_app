@@ -46,6 +46,7 @@ dependencies:
   catppuccin_flutter: ^1.0.0
   go_router: ^13.0.1
   url_launcher: ^6.2.2
+  loader_overlay: ^4.0.0
 
 dev_dependencies:
   flutter_test:
