@@ -14,7 +14,7 @@ class AuthenticationScreen extends StatelessWidget {
     
     ims.isUserAuthenticated().then((data) {
       if (data) {
-        context.go('/rooms');
+        context.go('/attandance');
       } else {
         if (ims.username != null && ims.password != null) {
         context.go('/authentication/auto_login');

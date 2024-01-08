@@ -23,7 +23,7 @@ class ManualRelogin extends StatelessWidget {
     await ims.authenticate(captchaText, username, password);
 
     if (ims.isAuthenticated) {
-      context.go('/rooms');
+      context.go('/attandance');
     } else {
       context.go('/authentication/manual_login');
     }

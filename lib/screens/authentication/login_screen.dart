@@ -55,7 +55,7 @@ class LoginScreen extends StatelessWidget {
         prefs.setString('username', username);
         prefs.setString('password', password);
 
-        context.go('/rooms');
+        context.go('/attandance');
       } else {
         showErrorDialog();
       }
