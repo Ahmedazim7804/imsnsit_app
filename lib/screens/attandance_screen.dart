@@ -59,9 +59,12 @@ class AttandanceScreen extends StatelessWidget {
       
           return Center(
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: subjectAttandance.map((item) => AttandanceCard(data: item,)).toList(),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: subjectAttandance.map((item) => AttandanceCard(data: item,)).toList(),
+                ),
               ),
             ),
           );
