@@ -47,6 +47,7 @@ dependencies:
   go_router: ^13.0.1
   url_launcher: ^6.2.2
   loader_overlay: ^4.0.0
+  flutter_native_splash: ^2.3.9
 
 dev_dependencies:
   flutter_test:

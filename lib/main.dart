@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/provider/version.dart';
 import 'package:imsnsit/router/router.dart';
 import 'package:provider/provider.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
@@ -42,10 +44,21 @@ ColorScheme colorScheme = ColorScheme.fromSeed(
     background: const Color.fromRGBO(5, 10, 48, 1),
     brightness: Brightness.dark);
 
-void main() {
+void main() async {
+
+  // Initialization Task
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  ImsProvider imsProvider = ImsProvider();
+  VersionProvider versionProvider = VersionProvider();
+  await imsProvider.ims.getInitialData();
+  await versionProvider.isLatestVersion();
+  FlutterNativeSplash.remove();
+
   runApp(
     MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => ImsProvider())
+      ChangeNotifierProvider(create: (_) => imsProvider),
+      ChangeNotifierProvider(create: (_) => versionProvider),
     ],
     child: MaterialApp.router(
     themeMode: ThemeMode.dark,

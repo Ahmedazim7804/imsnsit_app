@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imsnsit/root_scaffold.dart';
-import 'package:imsnsit/myapp.dart';
 import 'package:imsnsit/screens/about_screen.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/authentication_screen.dart';
@@ -11,6 +10,7 @@ import 'package:imsnsit/screens/authentication/manual_relogin.dart';
 import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
 import 'package:imsnsit/screens/subject_attendance_screen.dart';
+import 'package:imsnsit/widgets/update_widget.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
@@ -21,7 +21,7 @@ class MyAppRouter {
   
   static GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/authentication/authentication_screen',
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
@@ -65,10 +65,6 @@ class MyAppRouter {
         pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
       ),
       GoRoute(
-        path: '/',
-        pageBuilder: (context, state) => const MaterialPage(child: MyApp()),
-      ),
-      GoRoute(
         path: '/authentication/authentication_screen',
         pageBuilder: (context, state) => const MaterialPage(child: AuthenticationScreen()),
       ),
@@ -83,6 +79,10 @@ class MyAppRouter {
       GoRoute(
         path: '/about_screen',
         pageBuilder: (context, state) => const MaterialPage(child: AboutScreen()),
+      ),
+      GoRoute(
+        path: '/update_dialog',
+        pageBuilder: (context, state) => DialogPage(builder: (_) => const AlertDialog()),
       ),
       GoRoute(
         name: 'subject_attendance',
