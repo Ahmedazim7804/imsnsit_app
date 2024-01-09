@@ -7,12 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 class UpdateScreen extends StatelessWidget {
   const UpdateScreen({super.key});
 
-  Future<bool> checkForUpdate(VersionProvider versionProvider) async {
-    await versionProvider.isLatestVersion();
-
-    return versionProvider.needUpdate;
-  }
-
   @override
   Widget build(BuildContext context) {
     
