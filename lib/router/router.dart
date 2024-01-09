@@ -10,7 +10,7 @@ import 'package:imsnsit/screens/authentication/manual_relogin.dart';
 import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
 import 'package:imsnsit/screens/subject_attendance_screen.dart';
-import 'package:imsnsit/widgets/update_widget.dart';
+import 'package:imsnsit/widgets/update_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
@@ -21,7 +21,7 @@ class MyAppRouter {
   
   static GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/authentication/authentication_screen',
+    initialLocation: '/update_screen',
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
@@ -81,8 +81,12 @@ class MyAppRouter {
         pageBuilder: (context, state) => const MaterialPage(child: AboutScreen()),
       ),
       GoRoute(
-        path: '/update_dialog',
-        pageBuilder: (context, state) => DialogPage(builder: (_) => const AlertDialog()),
+        path: '/update_screen',
+        pageBuilder: (context, state) => const MaterialPage(
+          fullscreenDialog: true,
+          maintainState: true,
+          child: UpdateScreen()
+          ),
       ),
       GoRoute(
         name: 'subject_attendance',

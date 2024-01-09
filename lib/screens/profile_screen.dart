@@ -22,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
           actions: [
             IconButton(onPressed: () {
               context.read<ImsProvider>().ims.logout();
-              context.pushReplacement('/');
+              context.pushReplacement('/authentication/authentication_screen');
             }, icon: Icon(Icons.logout, color: Theme.of(context).textTheme.bodyLarge!.color,))
           ],
         ),
