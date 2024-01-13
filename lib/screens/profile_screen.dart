@@ -16,7 +16,7 @@ class ProfileScreen extends StatelessWidget {
           title: const Text("Profile"),
           centerTitle: true,
           leading: IconButton(
-            onPressed: () => context.go('/about_screen'),
+            onPressed: () => context.push('/about_screen'),
             icon: const Icon(Icons.info),
             color: Theme.of(context).textTheme.bodyLarge!.color),
           actions: [
