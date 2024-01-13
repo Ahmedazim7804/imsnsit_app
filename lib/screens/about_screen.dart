@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:imsnsit/provider/version.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -14,6 +16,9 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    String currentVersion = context.read<VersionProvider>().currentVersion;
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -50,7 +55,7 @@ class AboutScreen extends StatelessWidget {
                       ListTile(
                         leading: Icon(Icons.info, color: Theme.of(context).colorScheme.onBackground, size: 32,),
                         title: Text("Version", style: GoogleFonts.lexend(fontSize: 16),),
-                        subtitle: const Text('1.0.0-beta'),
+                        subtitle: Text(currentVersion),
                       ),
                     ],
                   ),
