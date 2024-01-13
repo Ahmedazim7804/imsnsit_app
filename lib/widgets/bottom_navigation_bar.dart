@@ -11,7 +11,7 @@ class MyBottomNavigationBar extends StatefulWidget {
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   void onItemTapped(int index) {
 
