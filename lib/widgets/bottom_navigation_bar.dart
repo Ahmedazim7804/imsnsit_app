@@ -10,11 +10,9 @@ class MyBottomNavigationBar extends StatefulWidget {
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
-
   int _selectedIndex = 1;
 
   void onItemTapped(int index) {
-
     setState(() {
       _selectedIndex = index;
     });
@@ -28,7 +26,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     } else {
       context.go('/');
     }
-
   }
 
   @override
@@ -38,12 +35,15 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: BottomNavigationBar(
-          selectedItemColor: Theme.of(context).colorScheme.onSecondary.withAlpha(150),
+          selectedItemColor:
+              Theme.of(context).colorScheme.onSecondary.withAlpha(150),
           selectedLabelStyle: GoogleFonts.lexend(),
           unselectedItemColor: Theme.of(context).colorScheme.onBackground,
           unselectedLabelStyle: GoogleFonts.lexend(),
-          selectedIconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSecondary.withAlpha(150)),
-          unselectedIconTheme: IconThemeData(color: Theme.of(context).colorScheme.onBackground),
+          selectedIconTheme: IconThemeData(
+              color: Theme.of(context).colorScheme.onSecondary.withAlpha(150)),
+          unselectedIconTheme:
+              IconThemeData(color: Theme.of(context).colorScheme.onBackground),
           backgroundColor: Theme.of(context).colorScheme.primary,
           elevation: 2,
           items: const [
@@ -52,13 +52,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
               label: 'Profile',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month,),
-              label: 'Attendance'
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.laptop),
-              label: 'APJ'
-            ),
+                icon: Icon(
+                  Icons.calendar_month,
+                ),
+                label: 'Attendance'),
+            BottomNavigationBarItem(icon: Icon(Icons.laptop), label: 'APJ'),
           ],
           currentIndex: _selectedIndex,
           onTap: onItemTapped,
