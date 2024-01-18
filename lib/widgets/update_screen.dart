@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/version.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -55,13 +56,19 @@ class UpdateDialog extends StatelessWidget {
               goToReleasePage();
               context.go('/authentication/authentication_screen');
             },
-            child: const Text("UPDATE NOW")),
+            child: Text(
+              "UPDATE NOW",
+              style: GoogleFonts.lexend(
+                  color: Theme.of(context).colorScheme.onSurface),
+            )),
         TextButton(
             onPressed: () {
               context.pop();
               context.go('/authentication/authentication_screen');
             },
-            child: const Text("LATER"))
+            child: Text("LATER",
+                style: GoogleFonts.lexend(
+                    color: Theme.of(context).colorScheme.onSurface)))
       ],
     );
   }
