@@ -36,7 +36,7 @@ class UpdateDialog extends StatelessWidget {
 
   void goToReleasePage() async {
     final Uri url = Uri.parse(
-        'https://github.com/ahmedazim7804/imsnsit_app/releases/tag/latest');
+        'https://github.com/ahmedazim7804/imsnsit_app/releases/latest');
 
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
