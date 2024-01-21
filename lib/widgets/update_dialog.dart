@@ -1,36 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:imsnsit/provider/version.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-class UpdateScreen extends StatelessWidget {
-  const UpdateScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (context.read<VersionProvider>().needUpdate) {
-        showDialog(context: context, builder: (_) => const UpdateDialog());
-      } else {
-        context.go('/authentication/authentication_screen');
-      }
-    });
-
-    return const Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('Checking for update... '),
-          CircularProgressIndicator()
-        ],
-      ),
-    ));
-  }
-}
 
 class UpdateDialog extends StatelessWidget {
   const UpdateDialog({super.key});
@@ -54,7 +25,7 @@ class UpdateDialog extends StatelessWidget {
         TextButton(
             onPressed: () {
               goToReleasePage();
-              context.go('/authentication/authentication_screen');
+              context.pop();
             },
             child: Text(
               "UPDATE NOW",
@@ -64,7 +35,6 @@ class UpdateDialog extends StatelessWidget {
         TextButton(
             onPressed: () {
               context.pop();
-              context.go('/authentication/authentication_screen');
             },
             child: Text("LATER",
                 style: GoogleFonts.lexend(
