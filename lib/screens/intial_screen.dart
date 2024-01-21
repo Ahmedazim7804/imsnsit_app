@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/model/imsnsit.dart';
@@ -10,8 +9,9 @@ import 'package:imsnsit/provider/version.dart';
 import 'package:imsnsit/widgets/update_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:imsnsit/widgets/conditional_visibilty.dart';
 
-enum NeedToLogin { checking, no, yes }
+enum NeedToLogin { checking, no, yes, completeLogin }
 
 enum LoggingIn { wait, successful, unsuccessful }
 
@@ -44,7 +44,7 @@ class _InitialScreenState extends State<InitialScreen> {
       }
       return NeedToLogin.yes;
     } else {
-      return NeedToLogin.yes;
+      return NeedToLogin.completeLogin;
     }
   }
 
@@ -108,6 +108,8 @@ class _InitialScreenState extends State<InitialScreen> {
                   context.go('/manual_login');
                 }
               });
+            } else if (userLoggedIn == NeedToLogin.completeLogin) {
+              context.go('/authentication/login_screen');
             } else {
               context.go('/attandance');
             }
@@ -188,7 +190,7 @@ class _InitialScreenState extends State<InitialScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Ims Available",
+                      "Ims Website Working",
                       style: GoogleFonts.lexend(),
                     ),
                     const SizedBox(
@@ -273,24 +275,5 @@ class _InitialScreenState extends State<InitialScreen> {
             ]),
       ),
     );
-  }
-}
-
-class ConditionalyVisible extends StatelessWidget {
-  const ConditionalyVisible(
-      {super.key, required this.child, required this.showIf});
-
-  final Widget child;
-  final bool showIf;
-
-  @override
-  Widget build(BuildContext context) {
-    return showIf
-        ? SizedBox(
-            height: 50,
-            child: child
-                .animate()
-                .fadeIn(duration: const Duration(milliseconds: 500)))
-        : const SizedBox.shrink();
   }
 }
