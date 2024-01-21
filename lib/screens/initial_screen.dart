@@ -27,7 +27,7 @@ class _InitialScreenState extends State<InitialScreen> {
   bool imsLoggedIn = false;
   bool imsUp = false;
   bool checkingForUpdate = false;
-  late Future<bool> waitForUpdateDialog = Future.delayed(Duration(seconds: 2));
+  late Future<bool> waitForUpdateDialog;
 
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
@@ -115,45 +115,45 @@ class _InitialScreenState extends State<InitialScreen> {
               return false;
             });
           }
-        });
 
-        ims.isImsUp().then((isImsUp) {
-          setState(() {
-            imsUp = isImsUp;
-          });
-
-          doesUserNeedToLogin().then((value) {
+          ims.isImsUp().then((isImsUp) {
             setState(() {
-              userLoggedIn = value;
+              imsUp = isImsUp;
             });
 
-            if (userLoggedIn == NeedToLogin.yes) {
-              autoLogin().then((loggingInResult) {
-                if (loggingInResult) {
-                  setState(() {
-                    loggingIn = LoggingIn.successful;
-                  });
-                  waitForUpdateDialog.whenComplete(() {
-                    context.go('/attandance');
-                  });
-                } else {
-                  setState(() {
-                    loggingIn = LoggingIn.unsuccessful;
-                  });
-                  waitForUpdateDialog.whenComplete(() {
-                    context.go('/authentication/manual_login');
-                  });
-                }
+            doesUserNeedToLogin().then((value) {
+              setState(() {
+                userLoggedIn = value;
               });
-            } else if (userLoggedIn == NeedToLogin.completeLogin) {
-              waitForUpdateDialog.whenComplete(() {
-                context.go('/authentication/login_screen');
-              });
-            } else {
-              waitForUpdateDialog.whenComplete(() {
-                context.go('/attandance');
-              });
-            }
+
+              if (userLoggedIn == NeedToLogin.yes) {
+                autoLogin().then((loggingInResult) {
+                  if (loggingInResult) {
+                    setState(() {
+                      loggingIn = LoggingIn.successful;
+                    });
+                    waitForUpdateDialog.whenComplete(() {
+                      context.go('/attandance');
+                    });
+                  } else {
+                    setState(() {
+                      loggingIn = LoggingIn.unsuccessful;
+                    });
+                    waitForUpdateDialog.whenComplete(() {
+                      context.go('/authentication/manual_login');
+                    });
+                  }
+                });
+              } else if (userLoggedIn == NeedToLogin.completeLogin) {
+                waitForUpdateDialog.whenComplete(() {
+                  context.go('/authentication/login_screen');
+                });
+              } else {
+                waitForUpdateDialog.whenComplete(() {
+                  context.go('/attandance');
+                });
+              }
+            });
           });
         });
       }
