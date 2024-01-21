@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/provider/intenet_availability.dart';
 import 'package:imsnsit/provider/version.dart';
 import 'package:imsnsit/router/router.dart';
 import 'package:provider/provider.dart';
@@ -45,27 +46,27 @@ ColorScheme colorScheme = ColorScheme.fromSeed(
     brightness: Brightness.dark);
 
 void main() async {
-
   // Initialization Task
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   ImsProvider imsProvider = ImsProvider();
   VersionProvider versionProvider = VersionProvider();
+  InternetProvider internetProvider = InternetProvider();
   await imsProvider.ims.getInitialData();
-  await versionProvider.isLatestVersion();
+  //await versionProvider.isLatestVersion();
   FlutterNativeSplash.remove();
 
-  runApp(
-    MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => imsProvider),
-      ChangeNotifierProvider(create: (_) => versionProvider),
-    ],
-    child: MaterialApp.router(
-    themeMode: ThemeMode.dark,
-    theme: catppuccinTheme(catppuccin.mocha),
-    routeInformationParser: MyAppRouter.router.routeInformationParser,
-    routerDelegate: MyAppRouter.router.routerDelegate,
-    routeInformationProvider: MyAppRouter.router.routeInformationProvider,
-  )
-    ));
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => imsProvider),
+        ChangeNotifierProvider(create: (_) => versionProvider),
+        ChangeNotifierProvider(create: (_) => internetProvider),
+      ],
+      child: MaterialApp.router(
+        themeMode: ThemeMode.dark,
+        theme: catppuccinTheme(catppuccin.mocha),
+        routeInformationParser: MyAppRouter.router.routeInformationParser,
+        routerDelegate: MyAppRouter.router.routerDelegate,
+        routeInformationProvider: MyAppRouter.router.routeInformationProvider,
+      )));
 }

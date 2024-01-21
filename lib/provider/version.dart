@@ -5,13 +5,16 @@ class VersionProvider extends ChangeNotifier {
   String currentVersion = '1.0.2';
   bool needUpdate = false;
 
-  Future<void> isLatestVersion() async {
+  Future<bool> isLatestVersion() async {
     final response =
         await http.get(Uri.parse('https://pastebin.com/raw/zYYfMgLq'));
     String? version = response.body;
 
     if (version != currentVersion) {
       needUpdate = true;
+      return true;
+    } else {
+      return false;
     }
   }
 }
