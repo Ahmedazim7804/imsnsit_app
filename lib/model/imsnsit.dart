@@ -11,7 +11,14 @@ import 'package:imsnsit/model/room.dart';
 
 import 'parseData.dart';
 
-enum LoginProperties { wrongCaptcha, wrongPassword, loginedSuccesfully }
+enum LoginProperties {
+  wrongCaptcha,
+  wrongPassword,
+  loginedSuccesfully,
+  timeout
+}
+
+enum HttpProperties { timeout, succesful, unsuccesful }
 
 class Ims {
   String? username;
@@ -159,60 +166,67 @@ class Ims {
       'logintype': 'student',
     };
 
-    var response = await session.post(
-        Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'),
-        headers: baseHeaders,
-        data: data);
+    try {
+      var response = await session
+          .post(Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php'),
+              headers: baseHeaders, data: data)
+          .timeout(const Duration(seconds: 5));
 
-    final doc = parse(response.body);
+      final doc = parse(response.body);
 
-    final loginResults = doc
-        .querySelectorAll("html body form table tbody tr td.plum_field font");
+      final loginResults = doc
+          .querySelectorAll("html body form table tbody tr td.plum_field font");
 
-    if (loginResults.length >= 2) {
-      final loginResult = loginResults[2].text;
-      if (loginResult.contains('Invalid Security Number')) {
-        isAuthenticated = false;
-        return LoginProperties.wrongCaptcha;
-      } else if (loginResult.contains('Invalid password') ||
-          loginResult.contains('Your password does not match')) {
-        isAuthenticated = false;
-        return LoginProperties.wrongPassword;
+      if (loginResults.length >= 2) {
+        final loginResult = loginResults[2].text;
+        if (loginResult.contains('Invalid Security Number')) {
+          isAuthenticated = false;
+          return LoginProperties.wrongCaptcha;
+        } else if (loginResult.contains('Invalid password') ||
+            loginResult.contains('Your password does not match')) {
+          isAuthenticated = false;
+          return LoginProperties.wrongPassword;
+        }
       }
+
+      referrer = response.request!.url.toString();
+
+      final List links = doc.getElementsByTagName('a');
+      for (Element link in links) {
+        if (link.text == 'Profile') {
+          profileUrl = link.attributes['href'];
+        }
+        if (link.text == 'My Activities') {
+          myActivitiesUrl = link.attributes['href'];
+        }
+        if (link.text == 'Logout') {
+          logoutUrl = link.attributes['href'];
+        }
+      }
+
+      final methodResponse = await getAllUrls();
+      if (methodResponse == HttpProperties.timeout) {
+        return LoginProperties.timeout;
+      }
+
+      store({
+        'username': username,
+        'password': password,
+        'cookies': session.getCookies(
+            Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
+        'profileUrl': profileUrl!,
+        'myActivitiesUrl': myActivitiesUrl!,
+        'referrer': referrer!,
+        'allUrls': allUrls,
+        'logoutUrl': logoutUrl,
+      });
+
+      isAuthenticated = true;
+
+      return LoginProperties.loginedSuccesfully;
+    } on TimeoutException catch (_) {
+      return LoginProperties.timeout;
     }
-
-    referrer = response.request!.url.toString();
-
-    final List links = doc.getElementsByTagName('a');
-    for (Element link in links) {
-      if (link.text == 'Profile') {
-        profileUrl = link.attributes['href'];
-      }
-      if (link.text == 'My Activities') {
-        myActivitiesUrl = link.attributes['href'];
-      }
-      if (link.text == 'Logout') {
-        logoutUrl = link.attributes['href'];
-      }
-    }
-
-    await getAllUrls();
-
-    store({
-      'username': username,
-      'password': password,
-      'cookies': session.getCookies(
-          Uri.parse('https://www.imsnsit.org/imsnsit/student_login.php')),
-      'profileUrl': profileUrl!,
-      'myActivitiesUrl': myActivitiesUrl!,
-      'referrer': referrer!,
-      'allUrls': allUrls,
-      'logoutUrl': logoutUrl,
-    });
-
-    isAuthenticated = true;
-
-    return LoginProperties.loginedSuccesfully;
   }
 
   Future<String> getCaptcha() async {
@@ -256,24 +270,32 @@ class Ims {
     return profileData;
   }
 
-  Future<void> getAllUrls() async {
-    print(myActivitiesUrl);
-    final response =
-        await session.get(Uri.parse(myActivitiesUrl!), headers: baseHeaders);
+  Future<HttpProperties> getAllUrls() async {
+    try {
+      final response = await session
+          .get(Uri.parse(myActivitiesUrl!), headers: baseHeaders)
+          .timeout(const Duration(seconds: 5));
 
-    final doc = parse(response.body);
+      final doc = parse(response.body);
 
-    final uncleanUrls = doc.getElementsByTagName('a');
+      final uncleanUrls = doc.getElementsByTagName('a');
 
-    for (var url in uncleanUrls) {
-      String? link = url.attributes['href'];
-      if (link != '#' && link != null) {
-        String key = url.text;
+      for (var url in uncleanUrls) {
+        String? link = url.attributes['href'];
+        if (link != '#' && link != null) {
+          String key = url.text;
 
-        // Removes all non-alphanumeric chars and convert to camelCase.
-        allUrls[key] = link;
+          // Removes all non-alphanumeric chars and convert to camelCase.
+          allUrls[key] = link;
+        }
       }
+    } on TimeoutException catch (_) {
+      return HttpProperties.timeout;
+    } catch (e) {
+      return HttpProperties.unsuccesful;
     }
+
+    return HttpProperties.succesful;
   }
 
   Future<Map<String, dynamic>> getEnrolledCourses() async {

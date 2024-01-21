@@ -16,7 +16,6 @@ class Session {
     }
 
     headers['Cookie'] = getCookies(url);
-    print(getCookies(url));
 
     http.Response response = await http.get(url, headers: headers);
 

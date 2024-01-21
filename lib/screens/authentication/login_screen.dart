@@ -55,8 +55,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     overlayStream.sink.add(const OverlayData(
         text: "Waiting for response from IMS", waiting: true));
+
     final authenticationStatus =
         await ims.authenticate(captchaText, username, password);
+
+    print(authenticationStatus);
+    if (authenticationStatus == LoginProperties.timeout) {
+      overlayPortalController.hide();
+      showTimeoutDialog();
+    }
 
     if (ims.isAuthenticated) {
       overlayStream.sink
@@ -78,6 +85,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void showErrorDialog() {
     showDialog(context: context, builder: (context) => popup(context));
+  }
+
+  void showTimeoutDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 169, 37, 16),
+              title: Text(
+                'An error has occured',
+                style: GoogleFonts.roboto(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                'Timeout occurred when connecting to ims website, Please try again.',
+                style: GoogleFonts.roboto(),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => context.pop(),
+                    child: const Text(
+                      "Ok",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            ));
   }
 
   Widget popup(BuildContext context) {

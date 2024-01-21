@@ -27,7 +27,7 @@ class _InitialScreenState extends State<InitialScreen> {
   bool imsLoggedIn = false;
   bool imsUp = false;
   bool checkingForUpdate = false;
-  late Future<bool> waitForUpdateDialog;
+  late Future<bool> waitForUpdateDialog = Future.delayed(Duration(seconds: 2));
 
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
@@ -49,6 +49,31 @@ class _InitialScreenState extends State<InitialScreen> {
     }
   }
 
+  Future<void> showTimeoutDialog() async {
+    await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 169, 37, 16),
+              title: Text(
+                'An error has occured',
+                style: GoogleFonts.roboto(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                'Timeout occurred when connecting to ims website, Please try again.',
+                style: GoogleFonts.roboto(),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => context.pop(),
+                    child: const Text(
+                      "Ok",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            ));
+  }
+
   Future<bool> autoLogin() async {
     String imageUrl = await ims.getCaptcha();
     String imagePath = await Functions.downloadFile(imageUrl);
@@ -59,7 +84,12 @@ class _InitialScreenState extends State<InitialScreen> {
     String username = prefs.getString('username')!;
     String password = prefs.getString('password')!;
 
-    await ims.authenticate(captchaText, username, password);
+    await ims.authenticate(captchaText, username, password).then((value) async {
+      if (value == LoginProperties.timeout) {
+        await showTimeoutDialog();
+        return ims.isAuthenticated;
+      }
+    });
 
     return ims.isAuthenticated;
   }
@@ -111,7 +141,7 @@ class _InitialScreenState extends State<InitialScreen> {
                     loggingIn = LoggingIn.unsuccessful;
                   });
                   waitForUpdateDialog.whenComplete(() {
-                    context.go('/manual_login');
+                    context.go('/authentication/manual_login');
                   });
                 }
               });
