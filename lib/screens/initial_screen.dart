@@ -27,7 +27,7 @@ class _InitialScreenState extends State<InitialScreen> {
   bool imsLoggedIn = false;
   bool imsUp = false;
   bool checkingForUpdate = false;
-  late Future<bool> waitForUpdateDialog;
+  Future<bool?> waitForUpdateDialog = Future.delayed(Duration.zero);
 
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
