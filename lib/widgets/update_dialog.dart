@@ -25,7 +25,7 @@ class UpdateDialog extends StatelessWidget {
         TextButton(
             onPressed: () {
               goToReleasePage();
-              context.pop();
+              context.pop(true);
             },
             child: Text(
               "UPDATE NOW",
@@ -34,7 +34,7 @@ class UpdateDialog extends StatelessWidget {
             )),
         TextButton(
             onPressed: () {
-              context.pop();
+              context.pop(true);
             },
             child: Text("LATER",
                 style: GoogleFonts.lexend(
