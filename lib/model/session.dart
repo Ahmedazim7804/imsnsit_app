@@ -9,14 +9,15 @@ class Session {
 
   Session({this.maxRedirects = 15});
 
-
-  Future<http.Response> get(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}}) async {
+  Future<http.Response> get(Uri url,
+      {int redirectsLeft = 15, Map<String, String> headers = const {}}) async {
     if (--redirectsLeft < 0) {
       throw Exception('Too many Redirects');
     }
 
     headers['Cookie'] = getCookies(url);
-    
+    print(getCookies(url));
+
     http.Response response = await http.get(url, headers: headers);
 
     updateCookies(response.headers, url);
@@ -26,15 +27,19 @@ class Session {
       headers['location'] = '';
       if (location != null) {
         final redirectUri = url.resolve(location);
-        
-        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
+
+        return get(redirectUri,
+            redirectsLeft: redirectsLeft - 1, headers: headers);
       }
     }
 
     return response;
   }
 
-  Future<http.Response> post(Uri url, {int redirectsLeft=15, Map<String, String> headers=const {}, Map<String, String> data = const{}}) async {
+  Future<http.Response> post(Uri url,
+      {int redirectsLeft = 15,
+      Map<String, String> headers = const {},
+      Map<String, String> data = const {}}) async {
     if (--redirectsLeft < 0) {
       throw Exception('Too many Redirects');
     }
@@ -50,11 +55,12 @@ class Session {
       headers['location'] = '';
       if (location != null) {
         final redirectUri = url.resolve(location);
-        
-        return get(redirectUri, redirectsLeft: redirectsLeft-1, headers: headers);
+
+        return get(redirectUri,
+            redirectsLeft: redirectsLeft - 1, headers: headers);
       }
     }
-    
+
     return response;
   }
 
@@ -66,7 +72,8 @@ class Session {
       host = host.substring(4);
     }
 
-    String cookieHeader = CookieStore.buildCookieHeader(cookies.getCookiesForRequest(host, path));
+    String cookieHeader =
+        CookieStore.buildCookieHeader(cookies.getCookiesForRequest(host, path));
 
     return cookieHeader;
   }
@@ -83,5 +90,4 @@ class Session {
       cookies.updateCookies(rawCookies, host, path);
     }
   }
-
 }

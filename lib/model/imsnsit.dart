@@ -167,7 +167,8 @@ class Ims {
       if (loginResult.contains('Invalid Security Number')) {
         isAuthenticated = false;
         return LoginProperties.wrongCaptcha;
-      } else if (loginResult.contains('Invalid password')) {
+      } else if (loginResult.contains('Invalid password') ||
+          loginResult.contains('Your password does not match')) {
         isAuthenticated = false;
         return LoginProperties.wrongPassword;
       }
@@ -184,6 +185,7 @@ class Ims {
         myActivitiesUrl = link.attributes['href'];
       }
     }
+
     await getAllUrls();
 
     store({
@@ -244,6 +246,7 @@ class Ims {
   }
 
   Future<void> getAllUrls() async {
+    print(myActivitiesUrl);
     final response =
         await session.get(Uri.parse(myActivitiesUrl!), headers: baseHeaders);
 
