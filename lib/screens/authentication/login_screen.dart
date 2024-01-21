@@ -24,6 +24,61 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final overlayPortalController = OverlayPortalController();
   final overlayStream = StreamController<OverlayData>.broadcast();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  late final ims = context.read<ImsProvider>().ims;
+
+  void onSubmit() async {
+    overlayPortalController.show();
+
+    String username = usernameController.text;
+    String password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      overlayPortalController.hide();
+      showErrorDialog();
+      return;
+    }
+
+    overlayStream.sink
+        .add(const OverlayData(text: "Getting Captcha", waiting: true));
+
+    String imageUrl = await ims.getCaptcha();
+
+    overlayStream.sink
+        .add(const OverlayData(text: "Downloading Captcha", waiting: true));
+    String imagePath = await Functions.downloadFile(imageUrl);
+
+    overlayStream.sink
+        .add(const OverlayData(text: "Solving Captcha", waiting: true));
+    String captchaText = await Functions.performOcr(imagePath);
+
+    overlayStream.sink.add(const OverlayData(
+        text: "Waiting for response from IMS", waiting: true));
+    final authenticationStatus =
+        await ims.authenticate(captchaText, username, password);
+
+    if (ims.isAuthenticated) {
+      overlayStream.sink
+          .add(const OverlayData(text: "Logged in", waiting: false));
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('username', username);
+      prefs.setString('password', password);
+
+      overlayPortalController.hide();
+      context.go('/attandance');
+    } else {
+      if (authenticationStatus == LoginProperties.wrongPassword) {
+        overlayPortalController.hide();
+        showErrorDialog();
+      }
+    }
+  }
+
+  void showErrorDialog() {
+    showDialog(context: context, builder: (context) => popup(context));
+  }
 
   Widget popup(BuildContext context) {
     return AlertDialog(
@@ -95,57 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-
-    final ims = Provider.of<ImsProvider>(context).ims;
-
-    void showErrorDialog() {
-      showDialog(context: context, builder: (context) => popup(context));
-    }
-
-    void onSubmit(Ims ims) async {
-      overlayPortalController.show();
-
-      overlayStream.sink
-          .add(const OverlayData(text: "Getting Captcha", waiting: true));
-
-      String imageUrl = await ims.getCaptcha();
-
-      overlayStream.sink
-          .add(const OverlayData(text: "Downloading Captcha", waiting: true));
-      String imagePath = await Functions.downloadFile(imageUrl);
-
-      overlayStream.sink
-          .add(const OverlayData(text: "Solving Captcha", waiting: true));
-      String captchaText = await Functions.performOcr(imagePath);
-
-      String username = usernameController.text;
-      String password = passwordController.text;
-
-      overlayStream.sink.add(const OverlayData(
-          text: "Waiting for response from IMS", waiting: true));
-      final authenticationStatus =
-          await ims.authenticate(captchaText, username, password);
-
-      if (ims.isAuthenticated) {
-        overlayStream.sink
-            .add(const OverlayData(text: "Logged in", waiting: false));
-
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('username', username);
-        prefs.setString('password', password);
-
-        overlayPortalController.hide();
-        context.go('/attandance');
-      } else {
-        if (authenticationStatus == LoginProperties.wrongPassword) {
-          overlayPortalController.hide();
-          showErrorDialog();
-        }
-      }
-    }
-
     return Scaffold(
       body: OverlayPortal(
         controller: overlayPortalController,
@@ -216,9 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  onSubmit(ims);
-                },
+                onPressed: onSubmit,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.onBackground,
                     shape: const RoundedRectangleBorder(

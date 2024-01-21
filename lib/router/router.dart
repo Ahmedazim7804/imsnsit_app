@@ -6,7 +6,7 @@ import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/auto_relogin.dart';
 import 'package:imsnsit/screens/authentication/login_screen.dart';
 import 'package:imsnsit/screens/authentication/manual_relogin.dart';
-import 'package:imsnsit/screens/intial_screen.dart';
+import 'package:imsnsit/screens/initial_screen.dart';
 import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
 import 'package:imsnsit/screens/subject_attendance_screen.dart';
