@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:imsnsit/root_scaffold.dart';
 import 'package:imsnsit/screens/about_screen.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
-import 'package:imsnsit/screens/authentication/auto_relogin.dart';
 import 'package:imsnsit/screens/authentication/login_screen.dart';
 import 'package:imsnsit/screens/authentication/manual_relogin.dart';
 import 'package:imsnsit/screens/initial_screen.dart';
@@ -66,11 +65,6 @@ class MyAppRouter {
           path: '/authentication/login_screen',
           pageBuilder: (context, state) =>
               const MaterialPage(child: LoginScreen()),
-        ),
-        GoRoute(
-          path: '/authentication/auto_login',
-          pageBuilder: (context, state) =>
-              const MaterialPage(child: AutoRelogin()),
         ),
         GoRoute(
           path: '/authentication/manual_login',
