@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -33,6 +34,7 @@ class Ims {
 
   String? profileUrl;
   String? myActivitiesUrl;
+  String? logoutUrl;
   String? referrer;
   Map<String, dynamic> allUrls = {};
   final Session session = Session();
@@ -57,6 +59,11 @@ class Ims {
     if (prefs.getKeys().contains('myActivitiesUrl') &&
         prefs.getString('myActivitiesUrl') != null) {
       myActivitiesUrl = prefs.getString('myActivitiesUrl');
+    }
+
+    if (prefs.getKeys().contains('logoutUrl') &&
+        prefs.getString('logoutUrl') != null) {
+      logoutUrl = prefs.getString('logoutUrl');
     }
 
     if (prefs.getKeys().contains('referrer') &&
@@ -184,6 +191,9 @@ class Ims {
       if (link.text == 'My Activities') {
         myActivitiesUrl = link.attributes['href'];
       }
+      if (link.text == 'Logout') {
+        logoutUrl = link.attributes['href'];
+      }
     }
 
     await getAllUrls();
@@ -197,6 +207,7 @@ class Ims {
       'myActivitiesUrl': myActivitiesUrl!,
       'referrer': referrer!,
       'allUrls': allUrls,
+      'logoutUrl': logoutUrl,
     });
 
     isAuthenticated = true;
@@ -420,6 +431,8 @@ class Ims {
   }
 
   void logout() async {
+    session.get(Uri.parse(logoutUrl!), headers: baseHeaders);
+
     session.cookies.cookies = [];
     username = null;
     password = null;
