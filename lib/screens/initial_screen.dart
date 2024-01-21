@@ -27,6 +27,7 @@ class _InitialScreenState extends State<InitialScreen> {
   bool imsLoggedIn = false;
   bool imsUp = false;
   bool checkingForUpdate = false;
+  late Future<bool> waitForUpdateDialog;
 
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
@@ -77,10 +78,12 @@ class _InitialScreenState extends State<InitialScreen> {
           });
 
           if (isUpdateAvailable) {
-            showDialog(
+            waitForUpdateDialog = showDialog(
                 barrierColor: Colors.transparent,
                 context: context,
-                builder: (_) => const UpdateDialog());
+                builder: (_) => const UpdateDialog()).then((value) {
+              return false;
+            });
           }
         });
 
@@ -100,18 +103,26 @@ class _InitialScreenState extends State<InitialScreen> {
                   setState(() {
                     loggingIn = LoggingIn.successful;
                   });
-                  context.go('/attandance');
+                  waitForUpdateDialog.whenComplete(() {
+                    context.go('/attandance');
+                  });
                 } else {
                   setState(() {
                     loggingIn = LoggingIn.unsuccessful;
                   });
-                  context.go('/manual_login');
+                  waitForUpdateDialog.whenComplete(() {
+                    context.go('/manual_login');
+                  });
                 }
               });
             } else if (userLoggedIn == NeedToLogin.completeLogin) {
-              context.go('/authentication/login_screen');
+              waitForUpdateDialog.whenComplete(() {
+                context.go('/authentication/login_screen');
+              });
             } else {
-              context.go('/attandance');
+              waitForUpdateDialog.whenComplete(() {
+                context.go('/attandance');
+              });
             }
           });
         });
