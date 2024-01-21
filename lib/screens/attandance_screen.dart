@@ -93,8 +93,7 @@ class AttandanceCard extends StatelessWidget {
       _attendenceNeeded =
           (int.parse(data.total) * 0.75) - (int.parse(data.present));
     }
-
-    return _attendenceNeeded.round();
+    return _attendenceNeeded.ceil();
   }
 
   @override
