@@ -115,45 +115,45 @@ class _InitialScreenState extends State<InitialScreen> {
               return false;
             });
           }
+        });
 
-          ims.isImsUp().then((isImsUp) {
+        ims.isImsUp().then((isImsUp) {
+          setState(() {
+            imsUp = isImsUp;
+          });
+
+          doesUserNeedToLogin().then((value) {
             setState(() {
-              imsUp = isImsUp;
+              userLoggedIn = value;
             });
 
-            doesUserNeedToLogin().then((value) {
-              setState(() {
-                userLoggedIn = value;
+            if (userLoggedIn == NeedToLogin.yes) {
+              autoLogin().then((loggingInResult) {
+                if (loggingInResult) {
+                  setState(() {
+                    loggingIn = LoggingIn.successful;
+                  });
+                  waitForUpdateDialog.whenComplete(() {
+                    context.go('/attandance');
+                  });
+                } else {
+                  setState(() {
+                    loggingIn = LoggingIn.unsuccessful;
+                  });
+                  waitForUpdateDialog.whenComplete(() {
+                    context.go('/authentication/manual_login');
+                  });
+                }
               });
-
-              if (userLoggedIn == NeedToLogin.yes) {
-                autoLogin().then((loggingInResult) {
-                  if (loggingInResult) {
-                    setState(() {
-                      loggingIn = LoggingIn.successful;
-                    });
-                    waitForUpdateDialog.whenComplete(() {
-                      context.go('/attandance');
-                    });
-                  } else {
-                    setState(() {
-                      loggingIn = LoggingIn.unsuccessful;
-                    });
-                    waitForUpdateDialog.whenComplete(() {
-                      context.go('/authentication/manual_login');
-                    });
-                  }
-                });
-              } else if (userLoggedIn == NeedToLogin.completeLogin) {
-                waitForUpdateDialog.whenComplete(() {
-                  context.go('/authentication/login_screen');
-                });
-              } else {
-                waitForUpdateDialog.whenComplete(() {
-                  context.go('/attandance');
-                });
-              }
-            });
+            } else if (userLoggedIn == NeedToLogin.completeLogin) {
+              waitForUpdateDialog.whenComplete(() {
+                context.go('/authentication/login_screen');
+              });
+            } else {
+              waitForUpdateDialog.whenComplete(() {
+                context.go('/attandance');
+              });
+            }
           });
         });
       }
