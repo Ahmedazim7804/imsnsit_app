@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -10,8 +9,9 @@ import 'package:imsnsit/provider/intenet_availability.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cookie_store/cookie_store.dart';
 import 'package:imsnsit/model/room.dart';
-
-import 'parseData.dart';
+import 'package:imsnsit/model/teacher.dart';
+import 'package:imsnsit/parsers/parseData.dart';
+import 'package:imsnsit/parsers/tableParser.dart';
 
 enum LoginProperties {
   wrongCaptcha,
@@ -488,6 +488,91 @@ class Ims {
     prefs.remove('allUrls');
     prefs.remove('username');
     prefs.remove('password');
+  }
+
+  Future<List<Teacher>> searchFaculty() async {
+    final List<Teacher> teacherList = [];
+
+    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
+
+    var response = await session.get(facultyPageUrl, headers: baseHeaders);
+
+    var doc = parse(response.body);
+
+    String inputText = doc.querySelector('html body p a')!.attributes['href']!;
+
+    RegExp regex = RegExp(r'(?<=javascript:openURL\().*?(?=,)');
+    Match? match = regex.firstMatch(inputText);
+
+    late Uri searchUrl;
+    if (match != null) {
+      searchUrl = baseUrl.resolve(match.group(0)!.replaceAll("\"", ""));
+    } else {
+      print("No match found");
+      return teacherList;
+    }
+
+    final data = {
+      'typ': 'fld',
+      'search': "shivam'",
+      'ctrl': 'eus',
+      'id': '1',
+      'category': '',
+      'proceed': 'Search',
+    };
+
+    response = await session.post(searchUrl, headers: baseHeaders, data: data);
+    doc = parse(response.body);
+
+    for (var _teacher in doc.querySelectorAll('li')) {
+      final attrs = _teacher.text.split('; ');
+      String tutor = attrs[0];
+      String tutorCode = attrs[1];
+      String subject = attrs[2];
+
+      Teacher teacher =
+          Teacher(tutor: tutor, tutorCode: tutorCode, subject: subject);
+
+      teacherList.add(teacher);
+    }
+
+    return teacherList;
+  }
+
+  Future<Map<String, dynamic>> getFacultyTimeTable(
+      Teacher teacher, String sem) async {
+    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
+
+    final data = {
+      'tutorcode': teacher.tutorCode,
+      'tutor': teacher.tutor,
+      'sem': sem,
+      'enc_sem': 'IY9Vr65L90+5HW2iKCN+9bd4Oc6cwrtXEw7brbYOMD4=',
+      'role': '',
+      'submit': 'Proceed',
+    };
+
+    final response =
+        await session.post(facultyPageUrl, data: data, headers: baseHeaders);
+
+    final table = parse(response.body).querySelector('table');
+
+    TableParser tableParser = TableParser(
+        table: table!,
+        firstRowIsInfo: true,
+        hasRowHeaders: true,
+        hasColumnHeaders: true,
+        result: Result.columnAndRowWise,
+        replace: {
+          '<b>': '',
+          '</b>': '',
+          '<br>': ' ',
+          '&nbsp': ' ',
+        });
+
+    final tableData = tableParser.convertToJson();
+
+    return tableData;
   }
 }
 
