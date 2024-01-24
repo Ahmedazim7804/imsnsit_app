@@ -3,7 +3,7 @@ This app provide access to attandance, profile and other data to NSUT students t
 
 # Features
 - Login and subsequent logins work without captcha (almost*).
-- Attandance Screen
+- Attendance Screen
 - Shows times when APJ room is unscheduled for class on any day.
 - Profile Screen
 
