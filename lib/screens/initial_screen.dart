@@ -5,6 +5,7 @@ import 'package:imsnsit/model/imsnsit.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/provider/intenet_availability.dart';
 import 'package:imsnsit/model/functions.dart';
+import 'package:imsnsit/provider/mode_provider.dart';
 import 'package:imsnsit/provider/version.dart';
 import 'package:imsnsit/widgets/update_dialog.dart';
 import 'package:provider/provider.dart';
@@ -23,14 +24,15 @@ class InitialScreen extends StatefulWidget {
 }
 
 class _InitialScreenState extends State<InitialScreen> {
-  bool internetAvailable = false;
   bool imsLoggedIn = false;
-  bool imsUp = false;
   bool checkingForUpdate = false;
   Future<bool?> waitForUpdateDialog = Future.delayed(Duration.zero);
 
+  HttpResult internetAvailable = HttpResult.waiting;
+  HttpResult imsUp = HttpResult.waiting;
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
+  bool useOfflineMode = false;
 
   late InternetProvider internetProvider = context.read<InternetProvider>();
   late VersionProvider versionProvider = context.read<VersionProvider>();
@@ -47,6 +49,13 @@ class _InitialScreenState extends State<InitialScreen> {
     } else {
       return NeedToLogin.completeLogin;
     }
+  }
+
+  void setOfflineMode() {
+    context.read<ModeProvider>().setOffline();
+    setState(() {
+      useOfflineMode = true;
+    });
   }
 
   Future<void> showTimeoutDialog() async {
@@ -99,9 +108,13 @@ class _InitialScreenState extends State<InitialScreen> {
     internetProvider.checkForInternet().then((availability) {
       setState(() {
         internetAvailable = availability;
+
+        if (!availability.value) {
+          setOfflineMode();
+        }
       });
 
-      if (internetAvailable) {
+      if (internetAvailable.value) {
         versionProvider.isLatestVersion().then((isUpdateAvailable) {
           setState(() {
             checkingForUpdate = true;
@@ -121,6 +134,11 @@ class _InitialScreenState extends State<InitialScreen> {
           setState(() {
             imsUp = isImsUp;
           });
+
+          if (!imsUp.value) {
+            setOfflineMode();
+            return;
+          }
 
           doesUserNeedToLogin().then((value) {
             setState(() {
@@ -188,19 +206,24 @@ class _InitialScreenState extends State<InitialScreen> {
                     SizedBox(
                         height: 20,
                         width: 20,
-                        child: internetAvailable
+                        child: internetAvailable.value
                             ? Icon(
                                 Icons.check,
                                 color: baseColor,
                               )
-                            : CircularProgressIndicator(
-                                color: baseColor,
-                              ))
+                            : (internetAvailable == HttpResult.waiting
+                                ? CircularProgressIndicator(
+                                    color: baseColor,
+                                  )
+                                : Icon(
+                                    Icons.close,
+                                    color: baseColor,
+                                  )))
                   ],
                 ),
               ),
               ConditionalyVisible(
-                showIf: internetAvailable == true,
+                showIf: internetAvailable.value == true,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -240,19 +263,24 @@ class _InitialScreenState extends State<InitialScreen> {
                     SizedBox(
                         height: 20,
                         width: 20,
-                        child: imsUp
+                        child: imsUp.value
                             ? Icon(
                                 Icons.check,
                                 color: baseColor,
                               )
-                            : CircularProgressIndicator(
-                                color: baseColor,
-                              ))
+                            : (imsUp == HttpResult.waiting
+                                ? CircularProgressIndicator(
+                                    color: baseColor,
+                                  )
+                                : Icon(
+                                    Icons.close,
+                                    color: baseColor,
+                                  )))
                   ],
                 ),
               ),
               ConditionalyVisible(
-                showIf: imsUp == true,
+                showIf: imsUp.value == true,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -313,6 +341,61 @@ class _InitialScreenState extends State<InitialScreen> {
                   ],
                 ),
               ),
+              useOfflineMode
+                  ? SizedBox(
+                      height: 16,
+                    )
+                  : SizedBox.shrink(),
+              ConditionalyVisible(
+                  showIf: useOfflineMode,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.onBackground,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    icon: Icon(Icons.refresh),
+                    label: Text(
+                      "Retry",
+                      style: GoogleFonts.lexend(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    onPressed: () {
+                      context.read<ModeProvider>().reset();
+                      context.push('/initial_screen');
+                    },
+                  )),
+              useOfflineMode
+                  ? SizedBox(
+                      height: 16,
+                    )
+                  : SizedBox.shrink(),
+              ConditionalyVisible(
+                  showIf: useOfflineMode,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.onBackground,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    icon:
+                        Icon(Icons.signal_wifi_connected_no_internet_4_rounded),
+                    label: Text(
+                      "Use offline Mode",
+                      style: GoogleFonts.lexend(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    onPressed: () {
+                      context.read<ModeProvider>().reset();
+                      context.push('/attandance');
+                    },
+                  )),
             ]),
       ),
     );

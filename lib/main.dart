@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/provider/intenet_availability.dart';
+import 'package:imsnsit/provider/mode_provider.dart';
 import 'package:imsnsit/provider/version.dart';
 import 'package:imsnsit/router/router.dart';
 import 'package:provider/provider.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ThemeData catppuccinTheme(Flavor flavor) {
   Color primaryColor = flavor.mauve;
@@ -52,6 +54,7 @@ void main() async {
   ImsProvider imsProvider = ImsProvider();
   VersionProvider versionProvider = VersionProvider();
   InternetProvider internetProvider = InternetProvider();
+  ModeProvider modeProvider = ModeProvider();
   await imsProvider.ims.getInitialData();
   //await versionProvider.isLatestVersion();
   FlutterNativeSplash.remove();
@@ -61,6 +64,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => imsProvider),
         ChangeNotifierProvider(create: (_) => versionProvider),
         ChangeNotifierProvider(create: (_) => internetProvider),
+        ChangeNotifierProvider(create: (_) => modeProvider),
+        Provider.value(value: await SharedPreferences.getInstance()),
       ],
       child: MaterialApp.router(
         themeMode: ThemeMode.dark,

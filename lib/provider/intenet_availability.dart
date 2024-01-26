@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:imsnsit/model/imsnsit.dart';
+
+enum HttpResult {
+  successful(true),
+  unsuccesful(false),
+  waiting(false),
+  timeout(false);
+
+  final bool value;
+  const HttpResult(this.value);
+}
 
 class InternetProvider extends ChangeNotifier {
   bool hasAccess = false;
 
-  Future<bool> checkForInternet() async {
+  Future<HttpResult> checkForInternet() async {
     try {
-      final response = await http.get(Uri.parse('https://www.google.com'));
+      final response = await http
+          .get(Uri.parse('https://www.google.com'))
+          .timeout(Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         hasAccess = true;
-        return true;
+        return HttpResult.successful;
       } else {
-        return false;
+        return HttpResult.unsuccesful;
       }
     } catch (e) {
-      return false;
+      return HttpResult.timeout;
     }
   }
 }

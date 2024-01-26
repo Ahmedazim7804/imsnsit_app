@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/model/session.dart';
+import 'package:imsnsit/provider/intenet_availability.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cookie_store/cookie_store.dart';
 import 'package:imsnsit/model/room.dart';
@@ -133,15 +135,19 @@ class Ims {
     // await session.get(baseUrl, headers: baseHeaders);
   }
 
-  Future<bool> isImsUp() async {
-    final res = await session
-        .get(baseUrl, headers: baseHeaders)
-        .timeout(Duration(seconds: 5));
+  Future<HttpResult> isImsUp() async {
+    try {
+      final res = await session
+          .get(baseUrl, headers: baseHeaders)
+          .timeout(Duration(seconds: 5));
 
-    if (res.statusCode == 200) {
-      return true;
-    } else {
-      return false;
+      if (res.statusCode == 200) {
+        return HttpResult.successful;
+      } else {
+        return HttpResult.unsuccesful;
+      }
+    } catch (e) {
+      return HttpResult.timeout;
     }
   }
 
@@ -267,6 +273,8 @@ class Ims {
     profileData['profileImage'] = profileImageUrl;
     profileData['profileUrl'] = profileUrl!;
 
+    Functions.saveJsonToFile(jsonEncode(profileData), DataType.profile);
+
     return profileData;
   }
 
@@ -384,6 +392,8 @@ class Ims {
     final attandanceData =
         ParseData.parseAttandanceData(response.body, courses);
 
+    Functions.saveJsonToFile(jsonEncode(attandanceData), DataType.attendance);
+
     return attandanceData;
   }
 
@@ -449,6 +459,13 @@ class Ims {
 
       rooms.add(room);
       streamController.sink.add(rooms);
+
+      if (roomName == "APJ-11") {
+        print(roomName);
+        final dataToSave =
+            jsonEncode(rooms.map((element) => element.toJson()).toList());
+        Functions.saveJsonToFile(dataToSave, DataType.rooms);
+      }
     }
   }
 
