@@ -49,6 +49,8 @@ dependencies:
   loader_overlay: ^4.0.0
   flutter_native_splash: ^2.3.9
   flutter_animate: ^4.4.0
+  path_provider:
+  intl:
 
 dev_dependencies:
   flutter_test:
