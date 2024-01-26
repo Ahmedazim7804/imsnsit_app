@@ -38,8 +38,8 @@ class MyAppRouter {
                   routes: [
                     GoRoute(
                       path: '/attandance',
-                      pageBuilder: (context, state) =>
-                          const MaterialPage(child: AttandanceScreen()),
+                      pageBuilder: (context, state) => const MaterialPage(
+                          child: AttandanceScreen(), maintainState: true),
                     ),
                   ]),
               StatefulShellBranch(

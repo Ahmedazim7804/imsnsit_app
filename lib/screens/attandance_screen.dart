@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
+import 'package:imsnsit/provider/mode_provider.dart';
+import 'package:imsnsit/widgets/outdated_data_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SubjectAttandance {
   late final String code;
@@ -43,41 +49,74 @@ class SubjectAttandance {
   }
 }
 
-class AttandanceScreen extends StatelessWidget {
+class AttandanceScreen extends StatefulWidget {
   const AttandanceScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Provider.of<ImsProvider>(context).ims.getAttandanceData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<SubjectAttandance> subjectAttandance = snapshot.data!.entries
-                .map((entry) => SubjectAttandance(entry: entry))
-                .toList();
+  State<AttandanceScreen> createState() => _AttandanceScreenState();
+}
 
-            return Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: subjectAttandance
-                        .map((item) => AttandanceCard(
-                              data: item,
-                            ))
-                        .toList(),
+class _AttandanceScreenState extends State<AttandanceScreen> {
+  late final bool _isOffline = context.read<ModeProvider>().offline;
+  late final OverlayPortalController overlayPortalController =
+      OverlayPortalController();
+  late final lastUpdated =
+      context.read<SharedPreferences>().getString('attendanceDataLastUpdated');
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isOffline) {
+        overlayPortalController.show();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OverlayPortal(
+      controller: overlayPortalController,
+      overlayChildBuilder: (ctx) => outdatedDataOverlay(ctx,
+          lastUpdated: lastUpdated!,
+          action: () => context.go('/initial_screen')),
+      child: FutureBuilder(
+          future: _isOffline
+              ? Functions.getJsonFromFile(DataType.attendance)
+              : Provider.of<ImsProvider>(context).ims.getAttandanceData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<SubjectAttandance> subjectAttandance =
+                  (snapshot.data! as Map<String, dynamic>)
+                      .entries
+                      .map((entry) => SubjectAttandance(entry: entry))
+                      .toList();
+
+              return Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: subjectAttandance
+                          .map((item) => AttandanceCard(
+                                data: item,
+                              ))
+                          .toList(),
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return Center(
-                child: CircularProgressIndicator(
-              color: Theme.of(context).colorScheme.onBackground,
-            ));
-          }
-        });
+              );
+            } else {
+              return Center(
+                  child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.onBackground,
+              ));
+            }
+          }),
+    );
   }
 }
 
