@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:imsnsit/model/imsnsit.dart';
 
 enum HttpResult {
   successful(true),
@@ -19,7 +18,7 @@ class InternetProvider extends ChangeNotifier {
     try {
       final response = await http
           .get(Uri.parse('https://www.google.com'))
-          .timeout(Duration(seconds: 5));
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         hasAccess = true;

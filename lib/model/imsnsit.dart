@@ -490,7 +490,7 @@ class Ims {
     prefs.remove('password');
   }
 
-  Future<List<Teacher>> searchFaculty() async {
+  Future<List<Teacher>> searchFaculty({required String searchTerm}) async {
     final List<Teacher> teacherList = [];
 
     final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
@@ -514,7 +514,7 @@ class Ims {
 
     final data = {
       'typ': 'fld',
-      'search': "shivam'",
+      'search': searchTerm,
       'ctrl': 'eus',
       'id': '1',
       'category': '',
@@ -539,13 +539,15 @@ class Ims {
     return teacherList;
   }
 
-  Future<Map<String, dynamic>> getFacultyTimeTable(
-      Teacher teacher, String sem) async {
+  Future<List<List<String>>> getFacultyTimeTable(
+      {required String tutor,
+      required String tutorCode,
+      String sem = "EVEN"}) async {
     final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
 
     final data = {
-      'tutorcode': teacher.tutorCode,
-      'tutor': teacher.tutor,
+      'tutorcode': tutorCode,
+      'tutor': tutor,
       'sem': sem,
       'enc_sem': 'IY9Vr65L90+5HW2iKCN+9bd4Oc6cwrtXEw7brbYOMD4=',
       'role': '',
@@ -566,11 +568,12 @@ class Ims {
         replace: {
           '<b>': '',
           '</b>': '',
-          '<br>': ' ',
+          '<br>': '\n',
+          '<hr>': '\n----------------------\n',
           '&nbsp': ' ',
         });
 
-    final tableData = tableParser.convertToJson();
+    final tableData = tableParser.getRowsFromTable(tableParser.table);
 
     return tableData;
   }

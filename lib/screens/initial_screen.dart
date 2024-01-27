@@ -353,10 +353,10 @@ class _InitialScreenState extends State<InitialScreen> {
                 ),
               ),
               retry
-                  ? SizedBox(
+                  ? const SizedBox(
                       height: 16,
                     )
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
               ConditionalyVisible(
                   showIf: retry,
                   child: ElevatedButton.icon(
@@ -366,7 +366,7 @@ class _InitialScreenState extends State<InitialScreen> {
                         shape: const RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8)))),
-                    icon: Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh),
                     label: Text(
                       "Retry",
                       style: GoogleFonts.lexend(
@@ -379,10 +379,10 @@ class _InitialScreenState extends State<InitialScreen> {
                     },
                   )),
               useOfflineMode
-                  ? SizedBox(
+                  ? const SizedBox(
                       height: 16,
                     )
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
               ConditionalyVisible(
                   showIf: useOfflineMode,
                   child: ElevatedButton.icon(
@@ -392,8 +392,8 @@ class _InitialScreenState extends State<InitialScreen> {
                         shape: const RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8)))),
-                    icon:
-                        Icon(Icons.signal_wifi_connected_no_internet_4_rounded),
+                    icon: const Icon(
+                        Icons.signal_wifi_connected_no_internet_4_rounded),
                     label: Text(
                       "Use offline Mode",
                       style: GoogleFonts.lexend(

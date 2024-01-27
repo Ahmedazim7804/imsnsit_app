@@ -34,6 +34,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       if (!prefs.containsKey("roomsDataLastUpdated")) {
         disabledIndexes.add(2);
       }
+
+      disabledIndexes.add(3);
     }
   }
 
@@ -49,6 +51,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         context.go('/attandance');
       } else if (index == 2) {
         context.go('/rooms');
+      } else if (index == 3) {
+        context.go('/screens/faculty/search');
       } else {
         context.go('/');
       }
@@ -77,6 +81,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             unselectedIconTheme: IconThemeData(
                 color: Theme.of(context).colorScheme.onBackground),
             backgroundColor: Theme.of(context).colorScheme.primary,
+            type: BottomNavigationBarType.fixed,
             elevation: 2,
             items: const [
               BottomNavigationBarItem(
@@ -89,6 +94,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                   ),
                   label: 'Attendance'),
               BottomNavigationBarItem(icon: Icon(Icons.laptop), label: 'APJ'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.schedule), label: 'Faculty'),
             ],
             currentIndex: _selectedIndex,
             onTap: onItemTapped,

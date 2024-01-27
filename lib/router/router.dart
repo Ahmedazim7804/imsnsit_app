@@ -5,6 +5,8 @@ import 'package:imsnsit/screens/about_screen.dart';
 import 'package:imsnsit/screens/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/login_screen.dart';
 import 'package:imsnsit/screens/authentication/manual_relogin.dart';
+import 'package:imsnsit/screens/faculty/faculty_search.dart';
+import 'package:imsnsit/screens/faculty/faculty_time_table.dart';
 import 'package:imsnsit/screens/initial_screen.dart';
 import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
@@ -18,6 +20,8 @@ final _shellNavigatorAttendanceKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellAttendance');
 final _shellNavigatorRoomsKey =
     GlobalKey<NavigatorState>(debugLabel: 'shellRooms');
+final _shellNavigatorFacultyKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shellFaculty');
 
 class MyAppRouter {
   static GoRouter router = GoRouter(
@@ -58,6 +62,26 @@ class MyAppRouter {
                       path: '/profile_screen',
                       pageBuilder: (context, state) =>
                           const MaterialPage(child: ProfileScreen()),
+                    ),
+                  ]),
+              StatefulShellBranch(
+                  navigatorKey: _shellNavigatorFacultyKey,
+                  routes: [
+                    GoRoute(
+                      path: '/screens/faculty/search',
+                      pageBuilder: (context, state) =>
+                          const MaterialPage(child: FacultySearch()),
+                    ),
+                    GoRoute(
+                      name: 'faculty_time_table',
+                      path:
+                          '/screens/faculty/time_table/:tutor/:tutorCode/:sem',
+                      pageBuilder: (context, state) => MaterialPage(
+                          child: FacultyTT(
+                        tutor: state.pathParameters['tutor']!,
+                        tutorCode: state.pathParameters['tutorCode']!,
+                        sem: state.pathParameters['sem']!,
+                      )),
                     ),
                   ])
             ]),
