@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
 Widget outdatedDataOverlay(BuildContext context,
-    {required String lastUpdated, required void Function() action}) {
+    {required String? lastUpdated, required void Function() action}) {
   return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
