@@ -24,3 +24,6 @@ This app provide access to attandance, profile and other data to NSUT students t
 
 # Permissions
 - Only internet permission is required.
+
+# For Contributors
+- The trained model for ocr is not available in the repository. For building the app or testing you can use any tesseract-4 compatible model, copy it in `assets/tessdata` as `mydigits.traineddata`.
