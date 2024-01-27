@@ -137,6 +137,18 @@ class AttandanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _isOffline = context.read<ModeProvider>().offline;
+
+    late final bool attendanceCardClickable;
+
+    if (_isOffline) {
+      attendanceCardClickable = context
+          .read<SharedPreferences>()
+          .containsKey('subjectWiseAttendanceDataLastUpdated');
+    } else {
+      attendanceCardClickable = true;
+    }
+
     final Color red = Colors.redAccent.withAlpha(150);
     final Color green = Colors.greenAccent.withAlpha(150);
 
@@ -146,8 +158,12 @@ class AttandanceCard extends StatelessWidget {
     Color cardColor = attendancePerc > 75 ? green : red;
 
     return InkWell(
-      onTap: () => context.pushNamed('subject_attendance',
-          pathParameters: {'subject': data.subject, 'subjectCode': data.code}),
+      onTap: attendanceCardClickable
+          ? () => context.pushNamed('subject_attendance', pathParameters: {
+                'subject': data.subject,
+                'subjectCode': data.code
+              })
+          : null,
       child: SizedBox(
         height: 170,
         child: Card(
