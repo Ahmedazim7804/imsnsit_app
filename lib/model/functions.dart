@@ -120,6 +120,8 @@ class Functions {
       // Casting data from dynamic -> Map<String, dynamic> -> Map<String, String>
       properData = (data as Map<String, dynamic>)
           .map((key, value) => MapEntry(key, value.toString()));
+    } else if (dataType == DataType.absoluteAttendance) {
+      properData = data as Map<String, dynamic>;
     }
 
     print("${dataType} data successfully loaded");

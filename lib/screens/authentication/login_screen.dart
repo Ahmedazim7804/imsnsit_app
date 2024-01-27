@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
       prefs.setString('password', password);
 
       overlayPortalController.hide();
-      context.go('/attandance');
+      context.go('/attendance/total');
     } else {
       if (authenticationStatus == LoginProperties.wrongPassword) {
         overlayPortalController.hide();

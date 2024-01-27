@@ -22,6 +22,7 @@ class _FacultySearchState extends State<FacultySearch> {
   String selectedRadioButton = "EVEN";
 
   void searchFaculty() async {
+    overlayPortalController.show();
     final String searchTerm = _searchTextController.text;
 
     if (searchTerm.isEmpty) {
@@ -34,6 +35,7 @@ class _FacultySearchState extends State<FacultySearch> {
     setState(() {
       searchResults;
     });
+    overlayPortalController.hide();
   }
 
   Widget overlayChildBuilder(BuildContext ctx) {

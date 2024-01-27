@@ -163,7 +163,7 @@ class _InitialScreenState extends State<InitialScreen> {
                     loggingIn = LoggingIn.successful;
                   });
                   waitForUpdateDialog.whenComplete(() {
-                    context.go('/attandance');
+                    context.go('/attendance/total');
                   });
                 } else {
                   setState(() {
@@ -180,7 +180,7 @@ class _InitialScreenState extends State<InitialScreen> {
               });
             } else {
               waitForUpdateDialog.whenComplete(() {
-                context.go('/attandance');
+                context.go('/attendance/total');
               });
             }
           });
@@ -403,7 +403,7 @@ class _InitialScreenState extends State<InitialScreen> {
                     ),
                     onPressed: () {
                       context.read<ModeProvider>().setOffline();
-                      context.push('/attandance');
+                      context.push('/attendance/total');
                     },
                   )),
             ]),

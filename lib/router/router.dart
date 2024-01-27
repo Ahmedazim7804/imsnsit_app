@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imsnsit/root_scaffold.dart';
 import 'package:imsnsit/screens/about_screen.dart';
-import 'package:imsnsit/screens/attandance_screen.dart';
+import 'package:imsnsit/screens/attendance/attandance_screen.dart';
 import 'package:imsnsit/screens/authentication/login_screen.dart';
 import 'package:imsnsit/screens/authentication/manual_relogin.dart';
 import 'package:imsnsit/screens/faculty/faculty_search.dart';
@@ -10,7 +10,7 @@ import 'package:imsnsit/screens/faculty/faculty_time_table.dart';
 import 'package:imsnsit/screens/initial_screen.dart';
 import 'package:imsnsit/screens/profile_screen.dart';
 import 'package:imsnsit/screens/rooms_screen.dart';
-import 'package:imsnsit/screens/subject_attendance_screen.dart';
+import 'package:imsnsit/screens/attendance/subject_attendance_screen.dart';
 import 'package:imsnsit/widgets/update_dialog.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -41,9 +41,18 @@ class MyAppRouter {
                   navigatorKey: _shellNavigatorAttendanceKey,
                   routes: [
                     GoRoute(
-                      path: '/attandance',
+                      path: '/attendance/total',
                       pageBuilder: (context, state) => const MaterialPage(
                           child: AttandanceScreen(), maintainState: true),
+                    ),
+                    GoRoute(
+                      name: 'subject_attendance',
+                      path: '/attendance/subject_wise/:subject/:subjectCode',
+                      pageBuilder: (context, state) => MaterialPage(
+                          child: SubjectAttandanceScreen(
+                        subject: state.pathParameters['subject']!,
+                        subjectCode: state.pathParameters['subjectCode']!,
+                      )),
                     ),
                   ]),
               StatefulShellBranch(
@@ -111,15 +120,6 @@ class MyAppRouter {
               fullscreenDialog: true,
               maintainState: true,
               child: UpdateDialog()),
-        ),
-        GoRoute(
-          name: 'subject_attendance',
-          path: '/subject_attendance/:subject/:subjectCode',
-          pageBuilder: (context, state) => MaterialPage(
-              child: SubjectAttandanceScreen(
-            subject: state.pathParameters['subject']!,
-            subjectCode: state.pathParameters['subjectCode']!,
-          )),
         ),
       ]);
 }
