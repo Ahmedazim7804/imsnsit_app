@@ -36,7 +36,7 @@ class Room {
         (jsonData['fri'] as List<dynamic>).map((e) => e.toString()).toList();
 
     return Room(
-      name: jsonData['name'],
+      name: name,
       mon: mon,
       tue: tue,
       wed: wed,
