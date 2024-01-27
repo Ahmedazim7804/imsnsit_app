@@ -33,6 +33,7 @@ class _InitialScreenState extends State<InitialScreen> {
   NeedToLogin userLoggedIn = NeedToLogin.checking;
   LoggingIn loggingIn = LoggingIn.wait;
   bool useOfflineMode = false;
+  bool retry = false;
 
   late InternetProvider internetProvider = context.read<InternetProvider>();
   late VersionProvider versionProvider = context.read<VersionProvider>();
@@ -52,10 +53,19 @@ class _InitialScreenState extends State<InitialScreen> {
   }
 
   void setOfflineMode() {
-    context.read<ModeProvider>().setOffline();
-    setState(() {
-      useOfflineMode = true;
-    });
+    final prefs = context.read<SharedPreferences>();
+
+    if (prefs.containsKey('attendanceDataLastUpdated')) {
+      context.read<ModeProvider>().setOffline();
+      setState(() {
+        useOfflineMode = true;
+        retry = true;
+      });
+    } else {
+      setState(() {
+        retry = true;
+      });
+    }
   }
 
   Future<void> showTimeoutDialog() async {
@@ -105,6 +115,7 @@ class _InitialScreenState extends State<InitialScreen> {
 
   @override
   void initState() {
+    context.read<ModeProvider>().reset();
     internetProvider.checkForInternet().then((availability) {
       setState(() {
         internetAvailable = availability;
@@ -341,13 +352,13 @@ class _InitialScreenState extends State<InitialScreen> {
                   ],
                 ),
               ),
-              useOfflineMode
+              retry
                   ? SizedBox(
                       height: 16,
                     )
                   : SizedBox.shrink(),
               ConditionalyVisible(
-                  showIf: useOfflineMode,
+                  showIf: retry,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -364,7 +375,6 @@ class _InitialScreenState extends State<InitialScreen> {
                           color: Theme.of(context).colorScheme.primary),
                     ),
                     onPressed: () {
-                      context.read<ModeProvider>().reset();
                       context.push('/initial_screen');
                     },
                   )),
@@ -392,7 +402,7 @@ class _InitialScreenState extends State<InitialScreen> {
                           color: Theme.of(context).colorScheme.primary),
                     ),
                     onPressed: () {
-                      context.read<ModeProvider>().reset();
+                      context.read<ModeProvider>().setOffline();
                       context.push('/attandance');
                     },
                   )),

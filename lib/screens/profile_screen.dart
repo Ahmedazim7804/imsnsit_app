@@ -18,9 +18,8 @@ class ProfileScreen extends StatelessWidget {
     final bool _isOffline = context.read<ModeProvider>().offline;
     late final OverlayPortalController overlayPortalController =
         OverlayPortalController();
-    late final lastUpdated = context
-        .read<SharedPreferences>()
-        .getString('attendanceDataLastUpdated');
+    late final lastUpdated =
+        context.read<SharedPreferences>().getString('profileDataLastUpdated');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_isOffline) {

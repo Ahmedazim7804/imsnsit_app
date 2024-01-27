@@ -24,32 +24,47 @@ class _RoomScreenState extends State<RoomScreen> {
   late final OverlayPortalController overlayPortalController =
       OverlayPortalController();
   late final lastUpdated =
-      context.read<SharedPreferences>().getString('attendanceDataLastUpdated');
-  late final action;
+      context.read<SharedPreferences>().getString('roomsDataLastUpdated');
+  late final Function() action;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_isOffline) {
-        Functions.getJsonFromFile(DataType.rooms).then((unparsedData) {
-          streamController.sink.add(unparsedData);
-        });
-        action = () => context.go('/initial_screen');
+    if (_isOffline) {
+      action = () => context.go('/initial_screen');
+      getCachedData();
+      overlayPortalController.show();
+    } else {
+      if (lastUpdated != null) {
+        action = () => getNewData();
+        getCachedData();
         overlayPortalController.show();
       } else {
-        context
-            .read<ImsProvider>()
-            .ims
-            .roomsList(streamController: streamController);
-        action = () => context
-            .read<ImsProvider>()
-            .ims
-            .roomsList(streamController: streamController);
+        action = () => getNewData();
+        getNewData();
       }
+    }
+  }
+
+  void getCachedData() {
+    Functions.getJsonFromFile(DataType.rooms).then((unparsedData) {
+      streamController.sink.add(unparsedData);
     });
+  }
+
+  void getNewData() {
+    streamController.sink.add([]);
+
+    context
+        .read<ImsProvider>()
+        .ims
+        .roomsList(streamController: streamController);
+
+    if (overlayPortalController.isShowing) {
+      overlayPortalController.hide();
+    }
   }
 
   @override
@@ -60,12 +75,7 @@ class _RoomScreenState extends State<RoomScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {
-                context
-                    .read<ImsProvider>()
-                    .ims
-                    .roomsList(streamController: streamController);
-              },
+              onPressed: action,
               icon: Icon(
                 Icons.refresh,
                 color: Theme.of(context).textTheme.bodyLarge!.color,
@@ -79,7 +89,7 @@ class _RoomScreenState extends State<RoomScreen> {
         child: StreamBuilder(
             stream: streamController.stream,
             builder: ((context, AsyncSnapshot<List<Room>> snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 return GridView.builder(
                     itemCount: snapshot.data!.length,
                     gridDelegate:
