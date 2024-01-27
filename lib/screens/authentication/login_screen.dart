@@ -59,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final authenticationStatus =
         await ims.authenticate(captchaText, username, password);
 
-    print(authenticationStatus);
     if (authenticationStatus == LoginProperties.timeout) {
       overlayPortalController.hide();
       showTimeoutDialog();

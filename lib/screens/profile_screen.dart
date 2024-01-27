@@ -108,7 +108,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ));
               } else {
-                print('object');
                 return Center(
                     child: CircularProgressIndicator(
                   color: Theme.of(context).colorScheme.onBackground,
