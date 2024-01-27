@@ -12,6 +12,6 @@ class ModeProvider extends ChangeNotifier {
   }
 
   void reset() {
-    offline = true;
+    offline = false;
   }
 }

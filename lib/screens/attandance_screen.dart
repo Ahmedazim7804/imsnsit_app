@@ -71,6 +71,8 @@ class _AttandanceScreenState extends State<AttandanceScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_isOffline) {
         overlayPortalController.show();
+      } else {
+        overlayPortalController.hide();
       }
     });
   }
