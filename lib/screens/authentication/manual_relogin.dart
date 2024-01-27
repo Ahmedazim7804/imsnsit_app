@@ -13,12 +13,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ManualRelogin extends StatelessWidget {
   const ManualRelogin({super.key});
 
-  Future<void> tryRelogin(BuildContext context, Ims ims, TextEditingController controller) async {
-
+  Future<void> tryRelogin(
+      BuildContext context, Ims ims, TextEditingController controller) async {
     context.loaderOverlay.show();
 
     String captchaText = controller.text;
-    
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username')!;
     String password = prefs.getString('password')!;
@@ -28,11 +28,10 @@ class ManualRelogin extends StatelessWidget {
     context.loaderOverlay.hide();
 
     if (ims.isAuthenticated) {
-      context.go('/attandance');
+      context.go('/attendance/total');
     } else {
       context.go('/authentication/manual_login');
     }
-
   }
 
   @override
@@ -45,10 +44,16 @@ class ManualRelogin extends StatelessWidget {
         title: Text("Enter Captcha", style: GoogleFonts.lexend(fontSize: 22)),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {
-              context.read<ImsProvider>().ims.logout();
-              context.pushReplacement('/authentication/authentication_screen');
-            }, icon: Icon(Icons.logout, color: Theme.of(context).textTheme.bodyLarge!.color,))
+          IconButton(
+              onPressed: () {
+                context.read<ImsProvider>().ims.logout();
+                context
+                    .pushReplacement('/authentication/authentication_screen');
+              },
+              icon: Icon(
+                Icons.logout,
+                color: Theme.of(context).textTheme.bodyLarge!.color,
+              ))
         ],
       ),
       body: LoaderOverlay(
@@ -56,54 +61,58 @@ class ManualRelogin extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CaptchImage(ims: ims),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextField(
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      cursorColor: Theme.of(context).colorScheme.onBackground,
-                      decoration: InputDecoration(
-                        labelText: 'Captcha',
-                        labelStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.primary.withAlpha(150),
-                        isDense: true,
-                        prefixIcon: const Icon(Icons.person_rounded),
-                        hintText: "Fill the digits in captcha above",
-                        hintStyle: GoogleFonts.lexend(color: Theme.of(context).colorScheme.onBackground),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20))
-                        )
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32,),
-                  ElevatedButton(
-                    onPressed: () async {
-                      tryRelogin(context, ims, controller);
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.onBackground,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))
-                    ),
-                    child: Text(
-                      "Submit", 
-                      style: GoogleFonts.lexend(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)
-                    )
-                  )
-                ],
+            children: [
+              CaptchImage(ims: ims),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  decoration: InputDecoration(
+                      labelText: 'Captcha',
+                      labelStyle: GoogleFonts.lexend(
+                          color: Theme.of(context).colorScheme.onBackground),
+                      filled: true,
+                      fillColor:
+                          Theme.of(context).colorScheme.primary.withAlpha(150),
+                      isDense: true,
+                      prefixIcon: const Icon(Icons.person_rounded),
+                      hintText: "Fill the digits in captcha above",
+                      hintStyle: GoogleFonts.lexend(
+                          color: Theme.of(context).colorScheme.onBackground),
+                      border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)))),
+                ),
               ),
+              const SizedBox(
+                height: 32,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    tryRelogin(context, ims, controller);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)))),
+                  child: Text("Submit",
+                      style: GoogleFonts.lexend(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary)))
+            ],
+          ),
         ),
       ),
-      );
+    );
   }
 }
 
 class CaptchImage extends StatelessWidget {
   const CaptchImage({super.key, required this.ims});
-  
+
   final Ims ims;
 
   Future<File> getLocalCaptchaImageFile() async {
@@ -113,20 +122,19 @@ class CaptchImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return FutureBuilder(
-      future: getLocalCaptchaImageFile(),
-      builder: (context, snapshot) {
-
-        if (snapshot.hasData) {
-        
-          return Image.file(snapshot.data!, height: 100, width: 100, scale: 0.1,);
-        
-        } else {
-          return const Text('Loading....');
-        }
-      
-      } 
-      );
+        future: getLocalCaptchaImageFile(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Image.file(
+              snapshot.data!,
+              height: 100,
+              width: 100,
+              scale: 0.1,
+            );
+          } else {
+            return const Text('Loading....');
+          }
+        });
   }
 }

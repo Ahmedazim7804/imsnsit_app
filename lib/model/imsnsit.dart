@@ -353,6 +353,10 @@ class Ims {
     response = await session.post(url, headers: baseHeaders, data: data);
 
     final attandanceData = ParseData.parseAbsoluteAttandanceData(response.body);
+
+    Functions.saveJsonToFile(
+        jsonEncode(attandanceData), DataType.absoluteAttendance);
+
     return attandanceData;
   }
 
@@ -488,6 +492,11 @@ class Ims {
     prefs.remove('allUrls');
     prefs.remove('username');
     prefs.remove('password');
+
+    prefs.remove('attendanceDataLastUpdated');
+    prefs.remove('subjectWiseAttendanceDataLastUpdated');
+    prefs.remove('roomsDataLastUpdated');
+    prefs.remove('profileDataLastUpdated');
   }
 
   Future<List<Teacher>> searchFaculty({required String searchTerm}) async {

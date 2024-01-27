@@ -48,7 +48,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       if (index == 0) {
         context.go('/profile_screen');
       } else if (index == 1) {
-        context.go('/attandance');
+        context.go('/attendance/total');
       } else if (index == 2) {
         context.go('/rooms');
       } else if (index == 3) {
