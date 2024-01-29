@@ -139,7 +139,7 @@ class Ims {
     try {
       final res = await session
           .get(baseUrl, headers: baseHeaders)
-          .timeout(Duration(seconds: 5));
+          .timeout(const Duration(seconds: 5));
 
       if (res.statusCode == 200) {
         return HttpResult.successful;
@@ -307,7 +307,7 @@ class Ims {
   }
 
   Future<Map<String, dynamic>> getEnrolledCourses() async {
-    Uri url = Uri.parse(allUrls['Current Semester Registered Courses.']!);
+    Uri url = Uri.parse(allUrls['Current Semester Courses Registered.']!);
 
     final response = await session.get(url, headers: baseHeaders);
 
@@ -322,7 +322,7 @@ class Ims {
 
   Future<Map<String, dynamic>> getAbsoulteAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
-    Uri url = Uri.parse(allUrls['Attendance Report']!);
+    Uri url = Uri.parse(allUrls['My Attendance']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
 
@@ -362,9 +362,12 @@ class Ims {
 
   Future<Map<String, dynamic>> getAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
-    Uri url = Uri.parse(allUrls['Attendance Report']!);
+    print('object');
+    print(allUrls);
+    Uri url = Uri.parse(allUrls['My Attendance']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
+
     final doc = parse(response.body);
 
     String encYear = doc.getElementById('enc_year')!.attributes['value']!;
@@ -502,7 +505,10 @@ class Ims {
   Future<List<Teacher>> searchFaculty({required String searchTerm}) async {
     final List<Teacher> teacherList = [];
 
-    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
+    for (var element in allUrls.keys) {
+      print(element);
+    }
+    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable  ']);
 
     var response = await session.get(facultyPageUrl, headers: baseHeaders);
 
@@ -552,7 +558,7 @@ class Ims {
       {required String tutor,
       required String tutorCode,
       String sem = "EVEN"}) async {
-    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable']);
+    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable  ']);
 
     final data = {
       'tutorcode': tutorCode,
