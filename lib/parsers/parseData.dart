@@ -141,6 +141,13 @@ class ParseData {
 
     for (final row in requiredRows) {
       List<Element> tdTags = row.querySelectorAll('td');
+
+      if (tdTags.length < 2) {
+        row.querySelectorAll('th').forEach((element) {
+          tdTags.add(element);
+        });
+      }
+
       List<String?> tdTagValues = tdTags.map((tag) => tag.text).toList();
 
       String key = tdTagValues[0]!;

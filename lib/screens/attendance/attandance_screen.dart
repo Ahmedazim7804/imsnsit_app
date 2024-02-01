@@ -125,23 +125,23 @@ class AttandanceCard extends StatelessWidget {
   final SubjectAttandance data;
 
   int get attendenceNeeded {
-    double _attendenceNeeded = 0;
+    double attendenceNeeded = 0;
 
     if (double.parse(data.percentage.substring(0, data.percentage.length - 1)) <
         75) {
-      _attendenceNeeded =
+      attendenceNeeded =
           (int.parse(data.total) * 0.75) - (int.parse(data.present));
     }
-    return _attendenceNeeded.ceil();
+    return attendenceNeeded.ceil();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _isOffline = context.read<ModeProvider>().offline;
+    final isOffline = context.read<ModeProvider>().offline;
 
     late final bool attendanceCardClickable;
 
-    if (_isOffline) {
+    if (isOffline) {
       attendanceCardClickable = context
           .read<SharedPreferences>()
           .containsKey('subjectWiseAttendanceDataLastUpdated');
@@ -220,7 +220,7 @@ class AttandanceCard extends StatelessWidget {
                         style: GoogleFonts.lexend(fontSize: 15)),
                     Text("Attended: ${data.present}",
                         style: GoogleFonts.lexend(fontSize: 15)),
-                    Text('Need: ${attendenceNeeded}',
+                    Text('Need: $attendenceNeeded',
                         style: GoogleFonts.lexend(fontSize: 15))
                   ],
                 )
