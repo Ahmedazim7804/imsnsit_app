@@ -43,7 +43,7 @@ app.*.map.json
 /android/app/release
 
 /lib/data.json
-
+/assets/tessdata/mydigits.traineddata
 
 android/app/build.gradle
 /android/app/build.gradle
