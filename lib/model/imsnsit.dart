@@ -362,8 +362,6 @@ class Ims {
 
   Future<Map<String, dynamic>> getAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
-    print('object');
-    print(allUrls);
     Uri url = Uri.parse(allUrls['My Attendance']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
@@ -468,7 +466,6 @@ class Ims {
       streamController.sink.add(rooms);
 
       if (roomName == "APJ-11") {
-        print(roomName);
         final dataToSave =
             jsonEncode(rooms.map((element) => element.toJson()).toList());
         Functions.saveJsonToFile(dataToSave, DataType.rooms);
@@ -505,9 +502,6 @@ class Ims {
   Future<List<Teacher>> searchFaculty({required String searchTerm}) async {
     final List<Teacher> teacherList = [];
 
-    for (var element in allUrls.keys) {
-      print(element);
-    }
     final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable  ']);
 
     var response = await session.get(facultyPageUrl, headers: baseHeaders);
