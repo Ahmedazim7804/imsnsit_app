@@ -15,14 +15,14 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool _isOffline = context.read<ModeProvider>().offline;
+    final bool isOffline = context.read<ModeProvider>().offline;
     late final OverlayPortalController overlayPortalController =
         OverlayPortalController();
     late final lastUpdated =
         context.read<SharedPreferences>().getString('profileDataLastUpdated');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_isOffline) {
+      if (isOffline) {
         overlayPortalController.show();
       }
     });
@@ -53,13 +53,13 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
         body: FutureBuilder(
-            future: _isOffline
+            future: isOffline
                 ? Functions.getJsonFromFile(DataType.profile)
                 : context.read<ImsProvider>().ims.getProfileData(),
             builder: ((context, snapshot) {
               if (snapshot.hasData) {
                 Map<String, String> data = snapshot.data!;
-
+                print(data.keys);
                 return Center(
                     child: SingleChildScrollView(
                   child: Column(

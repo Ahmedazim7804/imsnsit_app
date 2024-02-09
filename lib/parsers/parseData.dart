@@ -10,15 +10,17 @@ class ParseData {
 
     final elements = doc.getElementsByClassName('plum_fieldbig');
     for (Element element in elements) {
-      final tdTags = element.querySelectorAll('td');
+      final tags = [
+        ...element.querySelectorAll('th'),
+        ...element.querySelectorAll('td'),
+      ];
 
-      if (tdTags.length == 2) {
-        String text = tdTags[0].text;
-        String value = tdTags[1].text;
-
+      if (tags.length == 2) {
+        String text = tags[0].text;
+        String value = tags[1].text;
         data[text] = value;
       } else {
-        final image = tdTags[0].querySelectorAll('img');
+        final image = tags[0].querySelectorAll('img');
         if (image.isNotEmpty) {
           final imagePath = image[0].attributes['src'];
           data['profile_image'] = imagePath!;
@@ -89,10 +91,10 @@ class ParseData {
 
     for (final row in rows) {
       if (!row.attributes.containsKey('class')) {
-        List<Element> tdTags = row.querySelectorAll('td');
+        List<Element> tags = row.querySelectorAll('td');
 
-        if (tdTags.length > 2) {
-          List<String?> tdTagValues = tdTags.map((tag) => tag.text).toList();
+        if (tags.length > 2) {
+          List<String?> tdTagValues = tags.map((tag) => tag.text).toList();
 
           String day = tdTagValues[0]!;
           List<String?> attandanceData = tdTagValues.sublist(1);
@@ -140,15 +142,15 @@ class ParseData {
     final requiredRows = allRows.sublist(allRows.length - 4);
 
     for (final row in requiredRows) {
-      List<Element> tdTags = row.querySelectorAll('td');
+      List<Element> tags = row.querySelectorAll('td');
 
-      if (tdTags.length < 2) {
+      if (tags.length < 2) {
         row.querySelectorAll('th').forEach((element) {
-          tdTags.add(element);
+          tags.add(element);
         });
       }
 
-      List<String?> tdTagValues = tdTags.map((tag) => tag.text).toList();
+      List<String?> tdTagValues = tags.map((tag) => tag.text).toList();
 
       String key = tdTagValues[0]!;
       List<String?> values = tdTagValues.sublist(1);
