@@ -199,7 +199,7 @@ class Ims {
 
       final List links = doc.getElementsByTagName('a');
       for (Element link in links) {
-        if (link.text == 'Profile') {
+        if (link.text == 'My Profile') {
           profileUrl = link.attributes['href'];
         }
         if (link.text == 'My Activities') {
