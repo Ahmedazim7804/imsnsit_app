@@ -126,12 +126,16 @@ class AttandanceCard extends StatelessWidget {
 
   int get attendenceNeeded {
     double attendenceNeeded = 0;
+    double present = double.parse(data.present);
+    double total = double.parse(data.total);
 
     if (double.parse(data.percentage.substring(0, data.percentage.length - 1)) <
-        75) {
-      attendenceNeeded =
-          (int.parse(data.total) * 0.75) - (int.parse(data.present));
+        90) {
+      while ((present + attendenceNeeded) / (total + attendenceNeeded) < 0.75) {
+        attendenceNeeded += 1;
+      }
     }
+
     return attendenceNeeded.ceil();
   }
 
