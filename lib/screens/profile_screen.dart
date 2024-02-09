@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/provider/mode_provider.dart';
+import 'package:imsnsit/widgets/need_to_relogin.dart';
 import 'package:imsnsit/widgets/outdated_data_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:imsnsit/model/functions.dart';
@@ -59,7 +60,19 @@ class ProfileScreen extends StatelessWidget {
             builder: ((context, snapshot) {
               if (snapshot.hasData) {
                 Map<String, String> data = snapshot.data!;
-                print(data.keys);
+
+                if (data.isEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => const NeedToRelogin());
+                  });
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ));
+                }
+
                 return Center(
                     child: SingleChildScrollView(
                   child: Column(
