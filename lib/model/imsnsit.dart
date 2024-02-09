@@ -268,6 +268,11 @@ class Ims {
         await session.get(Uri.parse(profileUrl!), headers: baseHeaders);
 
     Map<String, String> profileData = ParseData.parseProfileData(response.body);
+
+    if (profileData.keys.isEmpty) {
+      return {};
+    }
+
     final profileImageUrl =
         baseUrl.resolve(profileData['profile_image']!).toString();
     profileData['profileImage'] = profileImageUrl;
