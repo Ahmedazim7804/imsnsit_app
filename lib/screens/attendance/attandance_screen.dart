@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:imsnsit/model/functions.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/provider/mode_provider.dart';
+import 'package:imsnsit/widgets/conditional_visibilty.dart';
 import 'package:imsnsit/widgets/outdated_data_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -178,7 +179,7 @@ class AttandanceCard extends StatelessWidget {
               })
           : null,
       child: SizedBox(
-        height: 190,
+        height: attendancePerc >= 75 ? 190 : 170,
         child: Card(
           margin: const EdgeInsets.all(15),
           color: cardColor,
@@ -261,20 +262,22 @@ class AttandanceCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Spacer(),
-              Container(
-                alignment: Alignment.center,
-                width: MediaQuery.sizeOf(context).width,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 22, 58, 23),
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10))),
-                child: Text(
-                    "You can bunk $bunkPossible classes without going below 75%.",
-                    style: GoogleFonts.lexend(fontSize: 11)),
-              ),
+              attendancePerc >= 75 ? const Spacer() : const SizedBox.shrink(),
+              attendancePerc >= 75
+                  ? Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.sizeOf(context).width,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 22, 58, 23),
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(10))),
+                      child: Text(
+                          "You can bunk $bunkPossible classes without going below 75%.",
+                          style: GoogleFonts.lexend(fontSize: 11)),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
