@@ -186,85 +186,99 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: overlayPortalController,
         overlayChildBuilder: overlayChildBuilder,
         child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Welcome to",
-                style: GoogleFonts.lexend(
-                    fontSize: 36, fontWeight: FontWeight.bold),
-              ),
-              Image.asset(
-                'assets/nsut.png',
-                width: 100,
-                height: 100,
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Text(
-                'Enter your credentials to log in your account',
-                style: GoogleFonts.lexend(fontSize: 15),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: TextField(
-                  controller: usernameController,
-                  cursorColor: Theme.of(context).colorScheme.onBackground,
-                  decoration: InputDecoration(
-                      labelText: 'Username',
-                      labelStyle: GoogleFonts.lexend(
-                          color: Theme.of(context).colorScheme.onBackground),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.primary.withAlpha(150),
-                      isDense: true,
-                      prefixIcon: const Icon(Icons.person_rounded),
-                      hintText: "Enter your username",
-                      hintStyle: GoogleFonts.lexend(
-                          color: Theme.of(context).colorScheme.onBackground),
-                      border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20)))),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: TextField(
-                  cursorColor: Theme.of(context).colorScheme.onBackground,
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                      labelText: 'Password',
-                      labelStyle: GoogleFonts.lexend(
-                          color: Theme.of(context).colorScheme.onBackground),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.primary.withAlpha(150),
-                      isDense: true,
-                      prefixIcon: const Icon(Icons.lock_rounded),
-                      border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20)))),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: onSubmit,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.onBackground,
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)))),
-                child: Text(
-                  "Submit",
+          child: AutofillGroup(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Welcome to",
                   style: GoogleFonts.lexend(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary),
+                      fontSize: 36, fontWeight: FontWeight.bold),
                 ),
-              )
-            ],
+                Image.asset(
+                  'assets/nsut.png',
+                  width: 100,
+                  height: 100,
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Text(
+                  'Enter your credentials to log in your account',
+                  style: GoogleFonts.lexend(fontSize: 15),
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: TextField(
+                    controller: usernameController,
+                    cursorColor: Theme.of(context).colorScheme.onBackground,
+                    autofillHints: const [
+                      AutofillHints.username,
+                      AutofillHints.email
+                    ],
+                    decoration: InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: GoogleFonts.lexend(
+                            color: Theme.of(context).colorScheme.onBackground),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withAlpha(150),
+                        isDense: true,
+                        prefixIcon: const Icon(Icons.person_rounded),
+                        hintText: "Enter your username",
+                        hintStyle: GoogleFonts.lexend(
+                            color: Theme.of(context).colorScheme.onBackground),
+                        border: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20)))),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: TextField(
+                    cursorColor: Theme.of(context).colorScheme.onBackground,
+                    controller: passwordController,
+                    autofillHints: const [AutofillHints.password],
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: GoogleFonts.lexend(
+                            color: Theme.of(context).colorScheme.onBackground),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withAlpha(150),
+                        isDense: true,
+                        prefixIcon: const Icon(Icons.lock_rounded),
+                        border: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20)))),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: onSubmit,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.onBackground,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)))),
+                  child: Text(
+                    "Submit",
+                    style: GoogleFonts.lexend(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
