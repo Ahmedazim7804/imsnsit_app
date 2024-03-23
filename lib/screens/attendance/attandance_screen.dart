@@ -129,14 +129,23 @@ class AttandanceCard extends StatelessWidget {
     double present = double.parse(data.present);
     double total = double.parse(data.total);
 
-    if (double.parse(data.percentage.substring(0, data.percentage.length - 1)) <
-        90) {
-      while ((present + attendenceNeeded) / (total + attendenceNeeded) < 0.75) {
-        attendenceNeeded += 1;
-      }
+    while ((present + attendenceNeeded) / (total + attendenceNeeded) < 0.75) {
+      attendenceNeeded += 1;
     }
 
     return attendenceNeeded.ceil();
+  }
+
+  int get bunkPossible {
+    int bunk = 0;
+    double present = double.parse(data.present);
+    double total = double.parse(data.total);
+
+    while ((present) / (total + bunk + 1) >= 0.75) {
+      bunk++;
+    }
+
+    return bunk;
   }
 
   @override
@@ -169,83 +178,104 @@ class AttandanceCard extends StatelessWidget {
               })
           : null,
       child: SizedBox(
-        height: 170,
+        height: 190,
         child: Card(
           margin: const EdgeInsets.all(15),
           color: cardColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(data.subject,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lexend(
-                        fontSize: 20,
-                        color: Theme.of(context).colorScheme.onBackground)),
-                Text(data.code,
-                    style: GoogleFonts.lexend(fontSize: 16),
-                    overflow: TextOverflow.ellipsis),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.min,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 200,
-                      alignment: Alignment.centerLeft,
-                      child: LinearProgressIndicator(
-                        minHeight: 20,
-                        borderRadius: BorderRadius.circular(10),
-                        value: double.parse(data.percentage
-                                .substring(0, data.percentage.length - 1)) /
-                            100,
-                        backgroundColor: Colors.white24,
-                        color: attendancePerc > 75 ? green : red,
-                      ),
+                    Text(data.subject,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.lexend(
+                            fontSize: 20,
+                            color: Theme.of(context).colorScheme.onBackground)),
+                    Text(data.code,
+                        style: GoogleFonts.lexend(fontSize: 16),
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: LinearProgressIndicator(
+                              minHeight: 20,
+                              borderRadius: BorderRadius.circular(10),
+                              value: double.parse(data.percentage.substring(
+                                      0, data.percentage.length - 1)) /
+                                  100,
+                              backgroundColor: Colors.white24,
+                              color: attendancePerc > 75 ? green : red,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Text(data.percentage,
+                            style: GoogleFonts.lexend(fontSize: 20)),
+                      ],
                     ),
                     const SizedBox(
-                      width: 15,
+                      height: 10,
                     ),
-                    Text(data.percentage,
-                        style: GoogleFonts.lexend(fontSize: 20)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text('Total: ${data.total}',
+                            style: GoogleFonts.lexend(fontSize: 15)),
+                        Text("Attended: ${data.present}",
+                            style: GoogleFonts.lexend(fontSize: 15)),
+                        attendancePerc < 75
+                            ? Text('Need: $attendenceNeeded',
+                                style: GoogleFonts.lexend(fontSize: 15))
+                            : const SizedBox.shrink()
+                      ],
+                    ),
+
+                    // Padding(
+                    //     padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
+                    //     child: Text("Attended: ${data.present}",
+                    //         style: GoogleFonts.lexend(fontSize: 15))),
+                    // Column(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Text(data.percentage,
+                    //         style: GoogleFonts.lexend(fontSize: 40)),
+                    //     const SizedBox(
+                    //       height: 25,
+                    //     ),
+                    //     Text('Total: ${data.total}',
+                    //         style: GoogleFonts.lexend(fontSize: 15))
+                    //   ],
+                    // )
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text('Total: ${data.total}',
-                        style: GoogleFonts.lexend(fontSize: 15)),
-                    Text("Attended: ${data.present}",
-                        style: GoogleFonts.lexend(fontSize: 15)),
-                    Text('Need: $attendenceNeeded',
-                        style: GoogleFonts.lexend(fontSize: 15))
-                  ],
-                )
-                // Padding(
-                //     padding: const EdgeInsets.fromLTRB(0, 0, 0, 7),
-                //     child: Text("Attended: ${data.present}",
-                //         style: GoogleFonts.lexend(fontSize: 15))),
-                // Column(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     Text(data.percentage,
-                //         style: GoogleFonts.lexend(fontSize: 40)),
-                //     const SizedBox(
-                //       height: 25,
-                //     ),
-                //     Text('Total: ${data.total}',
-                //         style: GoogleFonts.lexend(fontSize: 15))
-                //   ],
-                // )
-              ],
-            ),
+              ),
+              const Spacer(),
+              Container(
+                alignment: Alignment.center,
+                width: MediaQuery.sizeOf(context).width,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 22, 58, 23),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10))),
+                child: Text(
+                    "You can bunk $bunkPossible classes without going below 75%.",
+                    style: GoogleFonts.lexend(fontSize: 11)),
+              ),
+            ],
           ),
         ),
       ),

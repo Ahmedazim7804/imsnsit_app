@@ -17,7 +17,7 @@ class SubjectAttandanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool _isOffline = context.read<ModeProvider>().offline;
+    final bool isOffline = context.read<ModeProvider>().offline;
     final OverlayPortalController overlayPortalController =
         OverlayPortalController();
     final lastUpdated = context
@@ -25,7 +25,7 @@ class SubjectAttandanceScreen extends StatelessWidget {
         .getString('subjectWiseAttendanceDataLastUpdated');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_isOffline) {
+      if (isOffline) {
         overlayPortalController.show();
       } else {
         overlayPortalController.hide();
@@ -38,52 +38,55 @@ class SubjectAttandanceScreen extends StatelessWidget {
           lastUpdated: lastUpdated,
           action: () => context.go('/initial_screen')),
       child: FutureBuilder(
-          future: _isOffline
+          future: isOffline
               ? Functions.getJsonFromFile(DataType.absoluteAttendance)
               : context.read<ImsProvider>().ims.getAbsoulteAttandanceData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Scaffold(
                 body: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 64),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Card(
-                        color: Theme.of(context).colorScheme.secondary,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16, horizontal: 24),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                subject,
-                                style: GoogleFonts.lexend(fontSize: 16),
-                              ),
-                              Text(subjectCode,
-                                  style: GoogleFonts.lexend(fontSize: 14)),
-                            ],
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, top: 64, bottom: 20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Card(
+                          color: Theme.of(context).colorScheme.secondary,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  subject,
+                                  style: GoogleFonts.lexend(fontSize: 16),
+                                ),
+                                Text(subjectCode,
+                                    style: GoogleFonts.lexend(fontSize: 14)),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data![subjectCode]!.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 5),
-                        itemBuilder: (context, index) {
-                          final entry = snapshot.data![subjectCode].entries
-                              .elementAt(index);
-                          return AttandanceDayCard(
-                            day: entry.key,
-                            value: "${entry.value}",
-                          );
-                        },
-                      )
-                    ],
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data![subjectCode]!.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5),
+                          itemBuilder: (context, index) {
+                            final entry = snapshot.data![subjectCode].entries
+                                .elementAt(index);
+                            return AttandanceDayCard(
+                              day: entry.key,
+                              value: "${entry.value}",
+                            );
+                          },
+                        )
+                      ],
+                    ),
                   ),
                 ),
               );
