@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:imsnsit/bloc/pre_reqs_bloc.dart';
 import 'package:imsnsit/provider/ims_provider.dart';
 import 'package:imsnsit/provider/intenet_availability.dart';
 import 'package:imsnsit/provider/mode_provider.dart';
@@ -8,6 +9,7 @@ import 'package:imsnsit/router/router.dart';
 import 'package:provider/provider.dart';
 import 'package:catppuccin_flutter/catppuccin_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 ThemeData catppuccinTheme(Flavor flavor) {
   Color primaryColor = flavor.mauve;
@@ -55,8 +57,8 @@ void main() async {
   VersionProvider versionProvider = VersionProvider();
   InternetProvider internetProvider = InternetProvider();
   ModeProvider modeProvider = ModeProvider();
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   await imsProvider.ims.getInitialData();
-  //await versionProvider.isLatestVersion();
   FlutterNativeSplash.remove();
 
   runApp(MultiProvider(
@@ -65,13 +67,19 @@ void main() async {
         ChangeNotifierProvider(create: (_) => versionProvider),
         ChangeNotifierProvider(create: (_) => internetProvider),
         ChangeNotifierProvider(create: (_) => modeProvider),
-        Provider.value(value: await SharedPreferences.getInstance()),
+        Provider(create: (_) => sharedPreferences),
       ],
-      child: MaterialApp.router(
-        themeMode: ThemeMode.dark,
-        theme: catppuccinTheme(catppuccin.mocha),
-        routeInformationParser: MyAppRouter.router.routeInformationParser,
-        routerDelegate: MyAppRouter.router.routerDelegate,
-        routeInformationProvider: MyAppRouter.router.routeInformationProvider,
+      child: BlocProvider(
+        create: (context) => PreRequisitesBloc(
+            currentVersion: versionProvider.currentVersion,
+            ims: imsProvider.ims,
+            sharedPreferences: sharedPreferences),
+        child: MaterialApp.router(
+          themeMode: ThemeMode.dark,
+          theme: catppuccinTheme(catppuccin.mocha),
+          routeInformationParser: MyAppRouter.router.routeInformationParser,
+          routerDelegate: MyAppRouter.router.routerDelegate,
+          routeInformationProvider: MyAppRouter.router.routeInformationProvider,
+        ),
       )));
 }
