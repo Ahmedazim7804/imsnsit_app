@@ -1,5 +1,5 @@
 # Nsut Ims
-This app provide access to attandance, profile and other data to NSUT students through ims in an easy to use interface.
+This app provide access to attendance, profile and other data to NSUT students through ims in an easy to use interface.
 
 # Features
 - Login and subsequent logins work without captcha (almost*).
