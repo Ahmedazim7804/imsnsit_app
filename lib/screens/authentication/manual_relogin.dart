@@ -47,8 +47,7 @@ class ManualRelogin extends StatelessWidget {
           IconButton(
               onPressed: () {
                 context.read<ImsProvider>().ims.logout();
-                context
-                    .pushReplacement('/authentication/authentication_screen');
+                context.pushReplacement('/authentication/login_screen');
               },
               icon: Icon(
                 Icons.logout,

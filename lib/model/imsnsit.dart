@@ -166,7 +166,7 @@ class Ims {
       'uid': username,
       'pwd': password,
       'HRAND_NUM': hrandNum!,
-      'fy': '2023-24',
+      'fy': '2024-25',
       'comp': 'NETAJI SUBHAS UNIVERSITY OF TECHNOLOGY',
       'cap': cap,
       'logintype': 'student',
@@ -298,7 +298,8 @@ class Ims {
         if (link != '#' && link != null) {
           String key = url.text;
 
-          // Removes all non-alphanumeric chars and convert to camelCase.
+          // implement Removes all non-alphanumeric chars and convert to camelCase.
+          key = cleanUrlKey(key);
           allUrls[key] = link;
         }
       }
@@ -312,7 +313,7 @@ class Ims {
   }
 
   Future<Map<String, dynamic>> getEnrolledCourses() async {
-    Uri url = Uri.parse(allUrls['Current Semester Courses Registered.']!);
+    Uri url = Uri.parse(allUrls['currentsemcoursesregistered']!);
 
     final response = await session.get(url, headers: baseHeaders);
 
@@ -327,7 +328,7 @@ class Ims {
 
   Future<Map<String, dynamic>> getAbsoulteAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
-    Uri url = Uri.parse(allUrls['My Attendance']!);
+    Uri url = Uri.parse(allUrls['myattendance']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
 
@@ -343,7 +344,7 @@ class Ims {
     }
 
     Map<String, String> data = {
-      'year': '2023-24',
+      'year': '2024-25',
       'enc_year': encYear,
       'sem': semester!,
       'enc_sem': encSem,
@@ -367,7 +368,10 @@ class Ims {
 
   Future<Map<String, dynamic>> getAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
-    Uri url = Uri.parse(allUrls['My Attendance']!);
+    allUrls.forEach((key, value) {
+      print(key);
+    });
+    Uri url = Uri.parse(allUrls['myattendance']!);
 
     http.Response response = await session.get(url, headers: baseHeaders);
 
@@ -385,7 +389,7 @@ class Ims {
     Map<String, dynamic> courses = await getEnrolledCourses();
 
     Map<String, String> data = {
-      'year': '2023-24',
+      'year': '2024-25',
       'enc_year': encYear,
       'sem': semester!,
       'enc_sem': encSem,
@@ -507,7 +511,7 @@ class Ims {
   Future<List<Teacher>> searchFaculty({required String searchTerm}) async {
     final List<Teacher> teacherList = [];
 
-    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable  ']);
+    final facultyPageUrl = Uri.parse(allUrls['facultytimetable']);
 
     var response = await session.get(facultyPageUrl, headers: baseHeaders);
 
@@ -557,7 +561,7 @@ class Ims {
       {required String tutor,
       required String tutorCode,
       String sem = "EVEN"}) async {
-    final facultyPageUrl = Uri.parse(allUrls['Faculty Timetable  ']);
+    final facultyPageUrl = Uri.parse(allUrls['facultytimetable']);
 
     final data = {
       'tutorcode': tutorCode,
