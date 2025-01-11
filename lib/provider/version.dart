@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VersionProvider extends ChangeNotifier {
-  String currentVersion = '1.0.5';
+  String currentVersion = '1.0.5+2';
   bool needUpdate = false;
 
   Future<bool> isLatestVersion() async {
