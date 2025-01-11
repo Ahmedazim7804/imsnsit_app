@@ -83,7 +83,7 @@ class Functions {
     String date = DateFormat('dd MMM, yyyy HH:mm').format(now);
     sharedPreferences.setString(prefKey, date);
 
-    print("${dataType} data successfully stored");
+    print("$dataType data successfully stored");
   }
 
   static Future<dynamic> getJsonFromFile(DataType dataType) async {
@@ -124,8 +124,25 @@ class Functions {
       properData = data as Map<String, dynamic>;
     }
 
-    print("${dataType} data successfully loaded");
+    print("$dataType data successfully loaded");
 
     return properData;
   }
+}
+
+String cleanUrlKey(String input) {
+  // Remove non-alphanumeric characters and split into words
+  final words = input
+      .replaceAll(
+          RegExp(r'[^a-zA-Z0-9\s]'), '') // Remove non-alphanumeric characters
+      .split(RegExp(r'\s+')) // Split by whitespace
+      .where((word) => word.isNotEmpty) // Remove empty words
+      .toList();
+
+  if (words.isEmpty) return '';
+
+  // Convert to camelCase
+  String key = words.join("").toLowerCase();
+
+  return key;
 }
