@@ -22,6 +22,18 @@ enum LoginProperties {
 
 enum HttpProperties { timeout, succesful, unsuccesful }
 
+String? getFinancialYear() {
+  final DateTime now = DateTime.now();
+  final int year = now.year;
+  final int month = now.month;
+
+  if (month <= 5) {
+    return '${year - 1}-${(year % 100).toString().padLeft(2, '0')}';
+  }
+
+  return '$year-${((year + 1) % 100).toString().padLeft(2, '0')}';
+}
+
 class Ims {
   String? username;
   String? password;
@@ -389,7 +401,7 @@ class Ims {
     Map<String, dynamic> courses = await getEnrolledCourses();
 
     Map<String, String> data = {
-      'year': '2024-25',
+      'year': getFinancialYear()!,
       'enc_year': encYear,
       'sem': semester!,
       'enc_sem': encSem,
