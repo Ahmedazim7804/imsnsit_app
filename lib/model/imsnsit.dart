@@ -12,6 +12,7 @@ import 'package:imsnsit/model/room.dart';
 import 'package:imsnsit/model/teacher.dart';
 import 'package:imsnsit/parsers/parseData.dart';
 import 'package:imsnsit/parsers/tableParser.dart';
+import 'package:flutter/foundation.dart';
 
 enum LoginProperties {
   wrongCaptcha,
@@ -21,6 +22,18 @@ enum LoginProperties {
 }
 
 enum HttpProperties { timeout, succesful, unsuccesful }
+
+String getFinancialYear() {
+  final DateTime now = DateTime.now();
+  final int year = now.year;
+  final int month = now.month;
+
+  if (month <= 5) {
+    return '${year - 1}-${(year % 100).toString().padLeft(2, '0')}';
+  }
+
+  return '$year-${((year + 1) % 100).toString().padLeft(2, '0')}';
+}
 
 class Ims {
   String? username;
@@ -344,7 +357,7 @@ class Ims {
     }
 
     Map<String, String> data = {
-      'year': '2024-25',
+      'year': getFinancialYear(),
       'enc_year': encYear,
       'sem': semester!,
       'enc_sem': encSem,
@@ -369,7 +382,7 @@ class Ims {
   Future<Map<String, dynamic>> getAttandanceData(
       {String? rollNo, String? dept, String? degree}) async {
     allUrls.forEach((key, value) {
-      print(key);
+      debugPrint(key);
     });
     Uri url = Uri.parse(allUrls['myattendance']!);
 
@@ -389,7 +402,7 @@ class Ims {
     Map<String, dynamic> courses = await getEnrolledCourses();
 
     Map<String, String> data = {
-      'year': '2024-25',
+      'year': getFinancialYear(),
       'enc_year': encYear,
       'sem': semester!,
       'enc_sem': encSem,

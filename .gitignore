@@ -41,8 +41,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+assets/tessdata/**
 
 /lib/data.json
 
 android/app/build.gradle
 /android/app/build.gradle
+android/app/proguard-rules.pro
+/android/app/proguard-rules.pro
+
+# FVM Version Cache
+.fvm/
+.vscode/**
